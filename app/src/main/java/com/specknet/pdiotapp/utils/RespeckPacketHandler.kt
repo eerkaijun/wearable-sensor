@@ -58,7 +58,7 @@ class RESpeckPacketHandler(val speckService: BluetoothSpeckService) {
         // Independent of the RESpeck timestamp, we use the phone timestamp
         val actualPhoneTimestamp = Utils.getUnixTimestamp()
         Log.d("V6Decode: Process", values.contentToString())
-
+        // keep a list of 50 instances of the collection
 
         val r = when (useIMU) {
             false -> RESpeckPacketDecoder.V6.decodePacket(
