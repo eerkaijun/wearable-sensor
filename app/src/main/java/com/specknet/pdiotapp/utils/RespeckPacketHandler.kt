@@ -7,6 +7,7 @@ import com.specknet.pdiotapp.bluetooth.BluetoothSpeckService
 import org.apache.commons.lang3.time.DateUtils
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 /**
@@ -15,6 +16,9 @@ import kotlin.math.abs
  * this information
  */
 class RESpeckPacketHandler(val speckService: BluetoothSpeckService) {
+
+    var buffer = arrayOf<Array<Float>>()
+    var bufferCount = 0
 
     var fwVersion: String = speckService.reSpeckFwVersion
         set(value) {
@@ -203,6 +207,18 @@ class RESpeckPacketHandler(val speckService: BluetoothSpeckService) {
                 highFrequency = highFrequency
             )
             Log.i("Freq", "newRespeckLiveData = $newRESpeckLiveData")
+
+            // Kai's edit
+            if (bufferCount >= 50) {
+                // reset the buffer
+                buffer = arrayOf<Array<Float>>()
+                bufferCount = 0
+            }
+            val temp = arrayOf<Float>(x,y,z,gyro.x,gyro.y,gyro.z);
+            buffer += temp
+            bufferCount += 1
+            Log.i("One instance of data",  temp.toString());
+            Log.i("Current buffer content", buffer.contentDeepToString());
 
             // Store the important data in the external storage if set in config
             if (mIsStoreDataLocally) {
