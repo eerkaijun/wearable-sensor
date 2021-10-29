@@ -20,10 +20,19 @@ import com.specknet.pdiotapp.bluetooth.ConnectingActivity
 import com.specknet.pdiotapp.live.LiveDataActivity
 import com.specknet.pdiotapp.onboarding.OnBoardingActivity
 import com.specknet.pdiotapp.utils.Constants
+import com.specknet.pdiotapp.utils.RESpeckPacketHandler
 import com.specknet.pdiotapp.utils.Utils
 import kotlinx.android.synthetic.main.activity_main.*
 
+import org.tensorflow.lite.Interpreter
+import java.io.FileInputStream
+import java.io.IOException
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+
 class MainActivity : AppCompatActivity() {
+
+    //var tflite: Interpreter? = null
 
     // buttons and textviews
     lateinit var liveProcessingButton: Button
@@ -44,6 +53,17 @@ class MainActivity : AppCompatActivity() {
     val filter = IntentFilter()
 
     var isUserFirstTime = false
+
+    @Throws(IOException::class)
+    private fun loadModelFile(): MappedByteBuffer {
+        // val assets: AssetManager = this.getAssets()
+        val fileDescriptor = this.assets.openFd("model.tflite")
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel: FileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +96,46 @@ class MainActivity : AppCompatActivity() {
         // register a broadcast receiver for respeck status
         filter.addAction(Constants.ACTION_RESPECK_CONNECTED)
         filter.addAction(Constants.ACTION_RESPECK_DISCONNECTED)
+
+        val inputValue = Array(1) {
+            Array(50) {
+                FloatArray(6)
+            }
+        }
+        val outputValue = Array(1) {
+            FloatArray(3)
+        }
+        //var buffer = arrayOf<Array<Float>>()
+        for (i in 0..49) {
+            inputValue[0][i][0] = 0.5f
+            inputValue[0][i][1] = 0.5f
+            inputValue[0][i][2] = 0.5f
+            inputValue[0][i][3] = 0.5f
+            inputValue[0][i][4] = 0.5f
+            inputValue[0][i][5] = 0.5f
+            outputValue[0][0] = 0f
+            outputValue[0][1] = 0f
+            outputValue[0][2] = 0f
+            //val temp = arrayOf<Float>(0.5352F,0.546123F,0.531532F,0.51231F,0.578536F,0.597475F);
+            //buffer += temp
+        }
+        //val input = arrayOf(buffer)
+        //Log.i("Starting buffer content", buffer.contentDeepToString());
+        Log.i("Input value content", inputValue.contentDeepToString());
+        //val output = arrayOf(FloatArray(3))
+        //Log.i("Output content", output.contentDeepToString());
+        //Log.i("Input content", input.contentDeepToString());
+
+        try {
+            val tflite = Interpreter(loadModelFile())
+            Log.i("READ MODEL ", "SUCCESSFUL")
+            // Runs model inference and gets result
+            tflite.run(inputValue, outputValue)
+            Log.i("Predicted result", outputValue.contentDeepToString())
+        } catch(ex: Exception) {
+            Log.e("ERROR", "cannot read model file")
+            Log.e("ERROR", ex.toString())
+        }
 
     }
 
