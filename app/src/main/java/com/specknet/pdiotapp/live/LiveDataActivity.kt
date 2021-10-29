@@ -20,10 +20,28 @@ import com.specknet.pdiotapp.R
 import com.specknet.pdiotapp.utils.Constants
 import com.specknet.pdiotapp.utils.RESpeckLiveData
 import com.specknet.pdiotapp.utils.ThingyLiveData
+import org.tensorflow.lite.Interpreter
+import java.io.FileInputStream
+import java.io.IOException
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.collections.ArrayList
 
 
 class LiveDataActivity : AppCompatActivity() {
+
+    var inputValue = Array(1) {
+        Array(50) {
+            FloatArray(6)
+        }
+    }
+    var outputValue = Array(1) {
+        FloatArray(3)
+    }
+    var bufferCount = 0
+
+    // tflite interpreter to make real-time prediction
+    lateinit var tflite: Interpreter
 
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
@@ -51,11 +69,25 @@ class LiveDataActivity : AppCompatActivity() {
     val filterTestRespeck = IntentFilter(Constants.ACTION_RESPECK_LIVE_BROADCAST)
     val filterTestThingy = IntentFilter(Constants.ACTION_THINGY_BROADCAST)
 
+    @Throws(IOException::class)
+    private fun loadModelFile(): MappedByteBuffer {
+        // val assets: AssetManager = this.getAssets()
+        val fileDescriptor = this.assets.openFd("model.tflite")
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel: FileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_live_data)
 
         setupCharts()
+
+        tflite = Interpreter(loadModelFile())
+        Log.i("READ MODEL ", "SUCCESSFUL")
 
         // set up the broadcast receiver
         respeckLiveUpdateReceiver = object : BroadcastReceiver() {
@@ -75,6 +107,29 @@ class LiveDataActivity : AppCompatActivity() {
                     val x = liveData.accelX
                     val y = liveData.accelY
                     val z = liveData.accelZ
+
+                    // Build a buffer with intervals of 2 seconds (25Hz)
+                    if (bufferCount >= 50) {
+                        // do model prediction
+                        tflite.run(inputValue, outputValue)
+                        Log.i("Predicted result in LiveData", outputValue.contentDeepToString())
+                        // reset the buffer
+                        inputValue = Array(1) {
+                            Array(50) {
+                                FloatArray(6)
+                            }
+                        }
+                        bufferCount = 0
+                    }
+                    inputValue[0][bufferCount][0] = x
+                    inputValue[0][bufferCount][1] = y
+                    inputValue[0][bufferCount][2] = z
+                    inputValue[0][bufferCount][3] = liveData.gyro.x
+                    inputValue[0][bufferCount][4] = liveData.gyro.y
+                    inputValue[0][bufferCount][5] = liveData.gyro.z
+
+                    bufferCount += 1
+                    Log.i("Current buffer content", inputValue.contentDeepToString());
 
                     time += 1
                     updateGraph("respeck", x, y, z)
