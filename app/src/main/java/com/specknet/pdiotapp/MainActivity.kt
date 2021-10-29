@@ -20,7 +20,6 @@ import com.specknet.pdiotapp.bluetooth.ConnectingActivity
 import com.specknet.pdiotapp.live.LiveDataActivity
 import com.specknet.pdiotapp.onboarding.OnBoardingActivity
 import com.specknet.pdiotapp.utils.Constants
-import com.specknet.pdiotapp.utils.RESpeckPacketHandler
 import com.specknet.pdiotapp.utils.Utils
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -32,7 +31,8 @@ import java.nio.channels.FileChannel
 
 class MainActivity : AppCompatActivity() {
 
-    //var tflite: Interpreter? = null
+    // tflite interpreter to make real-time prediction
+    lateinit var tflite: Interpreter
 
     // buttons and textviews
     lateinit var liveProcessingButton: Button
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         //Log.i("Input content", input.contentDeepToString());
 
         try {
-            val tflite = Interpreter(loadModelFile())
+            tflite = Interpreter(loadModelFile())
             Log.i("READ MODEL ", "SUCCESSFUL")
             // Runs model inference and gets result
             tflite.run(inputValue, outputValue)
