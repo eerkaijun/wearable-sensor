@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
@@ -43,6 +44,8 @@ class LiveDataActivity : AppCompatActivity() {
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
 
+    //textview
+    lateinit var respeckTextView: TextView
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
     lateinit var dataSet_res_accel_y: LineDataSet
@@ -113,6 +116,9 @@ class LiveDataActivity : AppCompatActivity() {
                         // do model prediction
                         tflite.run(inputValue, outputValue)
                         Log.i("Predicted result in LiveData", outputValue.contentDeepToString())
+                        setContentView(R.layout.activity_live_data)
+                        respeckTextView = findViewById(R.id.recognizedActivityRespeck) as TextView;
+                        respeckTextView.append(outputValue.contentDeepToString())
                         // reset the buffer
                         inputValue = Array(1) {
                             Array(50) {
