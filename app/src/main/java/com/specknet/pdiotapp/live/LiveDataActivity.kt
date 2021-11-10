@@ -39,7 +39,7 @@ class LiveDataActivity : AppCompatActivity() {
         }
     }
     var outputValue = Array(1) {
-        FloatArray(3)
+        FloatArray(5)
     }
     var bufferCount = 0
 
@@ -77,7 +77,7 @@ class LiveDataActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun loadModelFile(): MappedByteBuffer {
         // val assets: AssetManager = this.getAssets()
-        val fileDescriptor = this.assets.openFd("model.tflite")
+        val fileDescriptor = this.assets.openFd("model_cnn.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -117,22 +117,25 @@ class LiveDataActivity : AppCompatActivity() {
                     if (bufferCount >= 50) {
                         // do model prediction
                         tflite.run(inputValue, outputValue)
-                        Log.i("Predicted result in LiveData", outputValue.contentDeepToString())
+                        Log.i("Predicted live data", outputValue.contentDeepToString())
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
-                        if(maxIdx == 0) respeckTextView.text = "Recogised activity: General movement"
-                        if(maxIdx == 1) respeckTextView.text = "Recogised activity: Running"
-                        if(maxIdx == 2) respeckTextView.text = "Recogised activity: Standing"
-                        //if(maxIdx == 0) Log.i("Predicted activitiy", "General movement")
-                        //if(maxIdx == 1) Log.i("Predicted activitiy", "Running")
-                        //if(maxIdx == 2) Log.i("Predicted activitiy", "Standing")
+                        if(maxIdx == 0) respeckTextView.text = "Recognised activity: Falling"
+                        if(maxIdx == 1) respeckTextView.text = "Recognised activity: Sitting/Standing"
+                        if(maxIdx == 2) respeckTextView.text = "Recognised activity: Lying down"
+                        if(maxIdx == 3) respeckTextView.text = "Recognised activity: Walking"
+                        if(maxIdx == 4) respeckTextView.text = "Recognised activity: Running"
 
-                        // reset the buffer
+                        // only reset half of the buffer to make a one second sliding window
+                        inputValue[0].drop(25)
+                        //Log.i("Buffer after resetting", inputValue.contentDeepToString());
+                        //Log.i("Length of buffer after resetting", inputValue.size.toString());
+                        /*
                         inputValue = Array(1) {
                             Array(50) {
                                 FloatArray(6)
                             }
-                        }
-                        bufferCount = 0
+                        }*/
+                        bufferCount = 25
                     }
                     inputValue[0][bufferCount][0] = x
                     inputValue[0][bufferCount][1] = y
