@@ -11,59 +11,85 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textView2"
+
+        <EditText
+            android:id="@+id/RespeckMain"
+            android:layout_width="139dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="12dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Respeck Status:"
+            app:layout_constraintBottom_toTopOf="@+id/ThingyMain"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/record_button" />
+
+        <EditText
+            android:id="@+id/ThingyMain"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Thingy Status:"
+            app:layout_constraintBottom_toTopOf="@+id/RecognisedMain"
+            app:layout_constraintEnd_toEndOf="@+id/RespeckMain"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/RecognisedMain"
+            app:layout_constraintTop_toBottomOf="@+id/RespeckMain" />
+
+        <EditText
+            android:id="@+id/RecognisedMain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:text="I want to"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="32dp"
+            android:layout_marginBottom="76dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Recognised Activity:"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/live_button" />
+
+        <ImageButton
+            android:id="@+id/ble_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="51dp"
+            android:layout_marginTop="78dp"
+            android:layout_marginEnd="105dp"
+            android:layout_marginBottom="85dp"
+            app:layout_constraintBottom_toTopOf="@+id/record_button"
+            app:layout_constraintEnd_toStartOf="@+id/live_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/record_button"/>
+            app:srcCompat="@drawable/connect_icon" />
 
-        <Button
-            android:id="@+id/record_button"
-            android:layout_width="550px"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:background="#03A9F4"
-            android:text="Record data"
-            android:textColor="#FFFFFF"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:layout_constraintBottom_toTopOf="@+id/live_button"/>
-
-
-        <Button
+        <ImageButton
             android:id="@+id/live_button"
-            android:layout_width="550px"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:background="#03A9F4"
-            android:text="Watch live processing"
-            android:textColor="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="99dp"
+            android:layout_marginBottom="462dp"
+            app:layout_constraintBottom_toTopOf="@+id/RecognisedMain"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_button"
-            app:layout_constraintBottom_toTopOf="@+id/ble_button"/>
+            app:layout_constraintStart_toEndOf="@+id/ble_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/record_live" />
 
-
-        <Button
-            android:id="@+id/ble_button"
-            android:layout_width="550px"
-            android:layout_height="wrap_content"
-            android:text="Connect sensors"
-            android:layout_marginTop="100px"
-            android:layout_marginBottom="100px"
-            android:background="#03A9F4"
-            android:textColor="#FFFFFF"
-            app:layout_constraintTop_toBottomOf="@+id/live_button"
-            app:layout_constraintEnd_toEndOf="parent"
+        <ImageButton
+            android:id="@+id/record_button"
+            android:layout_width="79dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="51dp"
+            android:layout_marginBottom="194dp"
+            app:layout_constraintBottom_toTopOf="@+id/RespeckMain"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/ble_button"
+            app:srcCompat="@drawable/record_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
