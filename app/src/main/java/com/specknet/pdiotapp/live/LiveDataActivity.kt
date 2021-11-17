@@ -35,8 +35,8 @@ import kotlin.math.sqrt
 
 class LiveDataActivity : AppCompatActivity() {
 
-    var lastMagnitude = 0.0f
-    var stepCount = 0
+    /*var lastMagnitude = 0.0f
+    var stepCount = 0*/
 
     var inputValue = Array(1) {
         Array(50) {
@@ -53,10 +53,10 @@ class LiveDataActivity : AppCompatActivity() {
 
     //textviews
     lateinit var respeckTextView: TextView
-    lateinit var mainPageTextView: TextView
-    lateinit var respeckStatus: TextView
-    lateinit var thingyStatus: TextView
-    lateinit var stepCountView: TextView
+    //lateinit var mainPageTextView: TextView
+    //lateinit var respeckStatus: TextView
+    //lateinit var thingyStatus: TextView
+    //lateinit var stepCountView: TextView
 
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
@@ -95,7 +95,7 @@ class LiveDataActivity : AppCompatActivity() {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    fun stepCounterWalking(x: Float, y: Float, z: Float){
+    /*fun stepCounterWalking(x: Float, y: Float, z: Float){
         val magnitude = sqrt((x*x + y*y + z*z))
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
@@ -109,7 +109,7 @@ class LiveDataActivity : AppCompatActivity() {
         lastMagnitude = magnitude
 
         if(delta > 10) stepCount++
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,13 +117,13 @@ class LiveDataActivity : AppCompatActivity() {
         //to update the live data layout
         setContentView(R.layout.activity_live_data)
         respeckTextView = findViewById<TextView>(R.id.recognizedActivityRespeck)
-        stepCountView = findViewById<TextView>(R.id.stepCount)
+        //stepCountView = findViewById<TextView>(R.id.stepCount)
 
         //update main layout text
-        setContentView(R.layout.activity_main)
+        /*setContentView(R.layout.activity_main)
         mainPageTextView = findViewById<TextView>(R.id.ActivityMain)
         respeckStatus  = findViewById<TextView>(R.id.RespeckStatus)
-        thingyStatus = findViewById<TextView>(R.id.ThingyStatus)
+        thingyStatus = findViewById<TextView>(R.id.ThingyStatus)*/
 
         setupCharts()
 
@@ -139,8 +139,8 @@ class LiveDataActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
-                    respeckStatus.text = "Connected"
-                    respeckStatus.setTextColor(Color.parseColor("#008000"))
+                    /*respeckStatus.text = "Connected"
+                    respeckStatus.setTextColor(Color.parseColor("#008000"))*/
 
                     val liveData =
                         intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
@@ -160,35 +160,35 @@ class LiveDataActivity : AppCompatActivity() {
 
                         when(maxIdx) {
                             0 -> {
-                                respeckTextView.text = "Recognised activity: Falling"
-                                mainPageTextView.text = "Recognised activity: Falling"
+                                respeckTextView.text = "You are currently: Falling"
+                                //mainPageTextView.text = "Recognised activity: Falling"
                             }
                             1 -> {
-                                respeckTextView.text = "Recognised activity: Sitting/Standing"
-                                mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                                respeckTextView.text = "You are currently: Sitting/Standing"
+                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
                             }
                             2 -> {
-                                respeckTextView.text = "Recognised activity: Lying down"
-                                mainPageTextView.text = "Recognised activity: Lying down"
+                                respeckTextView.text = "You are currently: Lying down"
+                                //mainPageTextView.text = "Recognised activity: Lying down"
                             }
                             3 -> {
-                                respeckTextView.text = "Recognised activity: Walking"
-                                mainPageTextView.text = "Recognised activity: Walking"
-                                stepCounterWalking(x,y,z)
+                                respeckTextView.text = "You are currently: Walking"
+                                //mainPageTextView.text = "Recognised activity: Walking"
+                                /*stepCounterWalking(x,y,z)
                                 var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()
+                                stepCountView.text = currentCount.toString()*/
 
                             }
                             4 -> {
-                                respeckTextView.text = "Recognised activity: Running"
-                                mainPageTextView.text = "Recognised activity: Running"
-                                stepCounterRunning(x,y,z)
+                                respeckTextView.text = "You are currently: Running"
+                                //mainPageTextView.text = "Recognised activity: Running"
+                                /*stepCounterRunning(x,y,z)
                                 var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()
+                                stepCountView.text = currentCount.toString()*/
                             }
                             else -> {
-                                respeckTextView.text = "Recognised activity: General Movement"
-                                mainPageTextView.text = "Recognised activity: General Movement"
+                                respeckTextView.text = "You are currently: General Movement"
+                                //mainPageTextView.text = "Recognised activity: General Movement"
                             }
                         }
 
@@ -219,10 +219,10 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("respeck", x, y, z)
 
                 }
-                else{
+                /*else{
                     respeckStatus.text = "Disconnected"
                     respeckStatus.setTextColor(Color.parseColor("#ff0000"))
-                }
+                }*/
             }
         }
 
@@ -242,8 +242,8 @@ class LiveDataActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_THINGY_BROADCAST) {
-                    thingyStatus.text = "Connected"
-                    thingyStatus.setTextColor(Color.parseColor("#008000"))
+                    //thingyStatus.text = "Connected"
+                    //thingyStatus.setTextColor(Color.parseColor("#008000"))
 
                     val liveData =
                         intent.getSerializableExtra(Constants.THINGY_LIVE_DATA) as ThingyLiveData
@@ -258,11 +258,11 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("thingy", x, y, z)
 
                 }
-                else{
+                /*else{
                     thingyStatus.text = "Disconnected"
                     thingyStatus.setTextColor(Color.parseColor("#ff0000"))
 
-                }
+                }*/
             }
         }
 
