@@ -117,13 +117,13 @@ class LiveDataActivity : AppCompatActivity() {
         //to update the live data layout
         setContentView(R.layout.activity_live_data)
         respeckTextView = findViewById<TextView>(R.id.recognizedActivityRespeck)
+        stepCountView = findViewById<TextView>(R.id.stepCount)
 
         //update main layout text
         setContentView(R.layout.activity_main)
         mainPageTextView = findViewById<TextView>(R.id.ActivityMain)
         respeckStatus  = findViewById<TextView>(R.id.RespeckStatus)
         thingyStatus = findViewById<TextView>(R.id.ThingyStatus)
-        stepCountView = findViewById<TextView>(R.id.stepCount)
 
         setupCharts()
 
