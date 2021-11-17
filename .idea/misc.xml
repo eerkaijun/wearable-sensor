@@ -9,7 +9,8 @@
         <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/drawable/ic_recording_icon.xml" value="0.14010416666666667" />
         <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/drawable/indicator_selected.xml" value="0.13645833333333332" />
         <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/drawable/indicator_unselected.xml" value="0.13645833333333332" />
-        <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/layout/activity_live_data.xml" value="0.4" />
+        <entry key="..\:/MSc AI/SEM 1/PDIoT/CW3 app/app/src/main/res/layout/activity_main.xml" value="0.30078125" />
         <entry key="app/src/main/res/drawable/vec_wireless_active.xml" value="0.24635416666666668" />
         <entry key="app/src/main/res/layout/activity_connecting.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/layout/activity_connecting_new.xml" value="0.2328125" />

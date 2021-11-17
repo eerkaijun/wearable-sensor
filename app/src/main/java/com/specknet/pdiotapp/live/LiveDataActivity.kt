@@ -48,6 +48,7 @@ class LiveDataActivity : AppCompatActivity() {
 
     //textview
     lateinit var respeckTextView: TextView
+    lateinit var mainPageTextView: TextView
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
     lateinit var dataSet_res_accel_y: LineDataSet
@@ -88,7 +89,9 @@ class LiveDataActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_live_data)
-        respeckTextView = findViewById(R.id.recognizedActivityRespeck) as TextView
+        respeckTextView = findViewById<TextView>(R.id.recognizedActivityRespeck)
+        setContentView(R.layout.activity_main)
+        mainPageTextView = findViewById<TextView>(R.id.ActivityMain)
         setupCharts()
 
         tflite = Interpreter(loadModelFile())
@@ -119,11 +122,34 @@ class LiveDataActivity : AppCompatActivity() {
                         tflite.run(inputValue, outputValue)
                         Log.i("Predicted live data", outputValue.contentDeepToString())
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
-                        if(maxIdx == 0) respeckTextView.text = "Recognised activity: Falling"
-                        if(maxIdx == 1) respeckTextView.text = "Recognised activity: Sitting/Standing"
-                        if(maxIdx == 2) respeckTextView.text = "Recognised activity: Lying down"
-                        if(maxIdx == 3) respeckTextView.text = "Recognised activity: Walking"
-                        if(maxIdx == 4) respeckTextView.text = "Recognised activity: Running"
+
+                        when(maxIdx) {
+                            0 -> {
+                                respeckTextView.text = "Recognised activity: Falling"
+                                mainPageTextView.text = "Recognised activity: Falling"
+                            }
+                            1 -> {
+                                respeckTextView.text = "Recognised activity: Sitting/Standing"
+                                mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                            }
+                            2 -> {
+                                respeckTextView.text = "Recognised activity: Lying down"
+                                mainPageTextView.text = "Recognised activity: Lying down"
+                            }
+                            3 -> {
+                                respeckTextView.text = "Recognised activity: Walking"
+                                mainPageTextView.text = "Recognised activity: Walking"
+                            }
+                            4 -> {
+                                respeckTextView.text = "Recognised activity: Running"
+                                mainPageTextView.text = "Recognised activity: Running"
+                            }
+                            else -> {
+                                respeckTextView.text = "Recognised activity: General Movement"
+                                mainPageTextView.text = "Recognised activity: General Movement"
+                            }
+                        }
+
 
                         // only reset half of the buffer to make a one second sliding window
                         inputValue[0].drop(25)

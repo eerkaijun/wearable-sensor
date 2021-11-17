@@ -6,6 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".live.LiveDataActivity">
 
+    <TextView
+        android:id="@+id/recognizedActivityRespeck"
+        android:layout_width="247dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="20dp"
+        android:text="Recognized activity:"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/respeck_graphs"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/recognizedActivityThingy"
+        android:layout_width="205dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="370dp"
+        android:text="Recognized activity:"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/respeck_graphs"
         android:layout_width="match_parent"
@@ -24,14 +48,8 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/respeck_chart"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="200dp">
 
-            <TextView
-                android:id="@+id/recognizedActivityRespeck"
-                android:layout_width="0dp"
-                android:layout_height="21dp"
-                android:layout_marginTop="64dp"
-                android:text="Recognized activity:" />
         </com.github.mikephil.charting.charts.LineChart>
 
     </LinearLayout>
@@ -54,19 +72,22 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/thingy_chart"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="200dp">
 
-            <TextView
-                android:id="@+id/recognizedActivityThingy"
-                android:layout_width="205dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="60dp"
-                android:text="Recognized activity:" />
         </com.github.mikephil.charting.charts.LineChart>
 
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/stepText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="288dp"
+        android:layout_marginTop="44dp"
+        android:text="Step Counter: "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
