@@ -1,17 +1,22 @@
 package com.specknet.pdiotapp
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
@@ -20,6 +25,7 @@ import com.specknet.pdiotapp.bluetooth.ConnectingActivity
 import com.specknet.pdiotapp.live.LiveDataActivity
 import com.specknet.pdiotapp.onboarding.OnBoardingActivity
 import com.specknet.pdiotapp.utils.Constants
+import com.specknet.pdiotapp.utils.RESpeckLiveData
 import com.specknet.pdiotapp.utils.Utils
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -31,6 +37,21 @@ import java.nio.channels.FileChannel
 
 class MainActivity : AppCompatActivity() {
 
+    // global broadcast receiver so we can unregister it
+    lateinit var respeckLiveUpdateReceiver: BroadcastReceiver
+    lateinit var looperRespeck: Looper
+    val filterTestRespeck = IntentFilter(Constants.ACTION_RESPECK_LIVE_BROADCAST)
+
+    var inputValue = Array(1) {
+        Array(50) {
+            FloatArray(6)
+        }
+    }
+    var outputValue = Array(1) {
+        FloatArray(5)
+    }
+    var bufferCount = 0
+
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
 
@@ -39,6 +60,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var pairingButton: Button
     lateinit var recordButton: Button
 
+    //text view
+    lateinit var activityMainTextView: TextView
     // permissions
     lateinit var permissionAlertDialog: AlertDialog.Builder
 
@@ -57,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun loadModelFile(): MappedByteBuffer {
         // val assets: AssetManager = this.getAssets()
-        val fileDescriptor = this.assets.openFd("model.tflite")
+        val fileDescriptor = this.assets.openFd("model_cnn.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -84,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         liveProcessingButton = findViewById(R.id.live_button)
         pairingButton = findViewById(R.id.ble_button)
         recordButton = findViewById(R.id.record_button)
+        activityMainTextView = findViewById<TextView>(R.id.activity_test)
 
         permissionAlertDialog = AlertDialog.Builder(this)
 
@@ -97,45 +121,108 @@ class MainActivity : AppCompatActivity() {
         filter.addAction(Constants.ACTION_RESPECK_CONNECTED)
         filter.addAction(Constants.ACTION_RESPECK_DISCONNECTED)
 
-        val inputValue = Array(1) {
-            Array(50) {
-                FloatArray(6)
+        tflite = Interpreter(loadModelFile())
+        Log.i("READ MODEL IN MAIN ", "SUCCESSFUL")
+
+        // set up the broadcast receiver
+        respeckLiveUpdateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+
+                Log.i("thread", "I am running on thread = " + Thread.currentThread().name)
+
+                val action = intent.action
+
+                if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
+                    /*respeckStatus.text = "Connected"
+                    respeckStatus.setTextColor(Color.parseColor("#008000"))*/
+
+                    val liveData =
+                            intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
+                    Log.d("Live", "onReceive: liveData = " + liveData)
+
+                    // get all relevant intent contents
+                    val x = liveData.accelX
+                    val y = liveData.accelY
+                    val z = liveData.accelZ
+
+
+
+                    // Build a buffer with intervals of 2 seconds (25Hz)
+                    if (bufferCount >= 50) {
+                        // do model prediction
+                        tflite.run(inputValue, outputValue)
+                        Log.i("Predicted live data", outputValue.contentDeepToString())
+                        val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
+
+                        when(maxIdx) {
+                            0 -> {
+                                activityMainTextView.text = "Falling"
+                                //mainPageTextView.text = "Recognised activity: Falling"
+                            }
+                            1 -> {
+                                activityMainTextView.text = "Sitting/Standing"
+                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                            }
+                            2 -> {
+                                activityMainTextView.text = "Lying down"
+                                //mainPageTextView.text = "Recognised activity: Lying down"
+                            }
+                            3 -> {
+                                activityMainTextView.text = "Walking"
+                                //mainPageTextView.text = "Recognised activity: Walking"
+                                /*stepCounterWalking(x,y,z)
+                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                                stepCountView.text = currentCount.toString()*/
+
+                            }
+                            4 -> {
+                                activityMainTextView.text = "Running"
+                                //mainPageTextView.text = "Recognised activity: Running"
+                                /*stepCounterRunning(x,y,z)
+                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                                stepCountView.text = currentCount.toString()*/
+                            }
+                        }
+
+
+                        // only reset half of the buffer to make a one second sliding window
+                        inputValue[0].drop(25)
+                        //Log.i("Buffer after resetting", inputValue.contentDeepToString());
+                        //Log.i("Length of buffer after resetting", inputValue.size.toString());
+                        /*
+                        inputValue = Array(1) {
+                            Array(50) {
+                                FloatArray(6)
+                            }
+                        }*/
+                        bufferCount = 25
+                    }
+                    inputValue[0][bufferCount][0] = x
+                    inputValue[0][bufferCount][1] = y
+                    inputValue[0][bufferCount][2] = z
+                    inputValue[0][bufferCount][3] = liveData.gyro.x
+                    inputValue[0][bufferCount][4] = liveData.gyro.y
+                    inputValue[0][bufferCount][5] = liveData.gyro.z
+
+                    bufferCount += 1
+                    Log.i("Current buffer content", inputValue.contentDeepToString());
+
+
+                }
+                /*else{
+                    respeckStatus.text = "Disconnected"
+                    respeckStatus.setTextColor(Color.parseColor("#ff0000"))
+                }*/
             }
         }
-        val outputValue = Array(1) {
-            FloatArray(3)
-        }
-        //var buffer = arrayOf<Array<Float>>()
-        for (i in 0..49) {
-            inputValue[0][i][0] = 0.5f
-            inputValue[0][i][1] = 0.5f
-            inputValue[0][i][2] = 0.5f
-            inputValue[0][i][3] = 0.5f
-            inputValue[0][i][4] = 0.5f
-            inputValue[0][i][5] = 0.5f
-            outputValue[0][0] = 0f
-            outputValue[0][1] = 0f
-            outputValue[0][2] = 0f
-            //val temp = arrayOf<Float>(0.5352F,0.546123F,0.531532F,0.51231F,0.578536F,0.597475F);
-            //buffer += temp
-        }
-        //val input = arrayOf(buffer)
-        //Log.i("Starting buffer content", buffer.contentDeepToString());
-        Log.i("Input value content", inputValue.contentDeepToString());
-        //val output = arrayOf(FloatArray(3))
-        //Log.i("Output content", output.contentDeepToString());
-        //Log.i("Input content", input.contentDeepToString());
 
-        try {
-            tflite = Interpreter(loadModelFile())
-            Log.i("READ MODEL ", "SUCCESSFUL")
-            // Runs model inference and gets result
-            tflite.run(inputValue, outputValue)
-            Log.i("Predicted result", outputValue.contentDeepToString())
-        } catch(ex: Exception) {
-            Log.e("ERROR", "cannot read model file")
-            Log.e("ERROR", ex.toString())
-        }
+        // register receiver on another thread
+        val handlerThreadRespeck = HandlerThread("bgThreadRespeckLive")
+        handlerThreadRespeck.start()
+        looperRespeck = handlerThreadRespeck.looper
+        val handlerRespeck = Handler(looperRespeck)
+        this.registerReceiver(respeckLiveUpdateReceiver, filterTestRespeck, null, handlerRespeck)
+
 
     }
 

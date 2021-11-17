@@ -108,19 +108,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/ActivityMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="209dp"
-            android:layout_marginTop="606dp"
-            android:text="None"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#100F0F"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/RespeckMain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -157,10 +144,15 @@
             android:text="Recognised Activity:"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="#151414"
-            app:layout_constraintEnd_toStartOf="@+id/ActivityMain"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/activity_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="217dp"
+            tools:layout_editor_absoluteY="604dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
