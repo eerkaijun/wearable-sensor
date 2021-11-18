@@ -2,68 +2,162 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/coordinatorLayout"
+    android:background="#3F51B5"
+    android:backgroundTint="#3F51B5"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#DEF1C8">
+
+        <Button
+            android:id="@+id/ble_button"
+            android:layout_width="109dp"
+            android:layout_height="92dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="68dp"
+            android:background="@drawable/connect_icon"
+            android:backgroundTint="@color/indigo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+
+        <Button
+            android:id="@+id/live_button"
+            android:layout_width="109dp"
+            android:layout_height="92dp"
+            android:layout_marginStart="224dp"
+            android:layout_marginTop="68dp"
+            android:background="@drawable/record_live"
+            android:backgroundTint="@color/indigo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <Button
+            android:id="@+id/record_button"
+            android:layout_width="109dp"
+            android:layout_height="92dp"
+            android:layout_marginStart="51dp"
+            android:layout_marginTop="257dp"
+            android:background="@drawable/record_icon"
+            android:backgroundTint="@color/indigo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="183dp"
+            android:text="Connect Sensors"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:text="I want to"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="224dp"
+            android:layout_marginTop="183dp"
+            android:text="Watch Live Data"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/record_button"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/record_button"
-            android:layout_width="550px"
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:background="#03A9F4"
-            android:text="Record data"
-            android:textColor="#FFFFFF"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="65dp"
+            android:layout_marginTop="356dp"
+            android:text="Record Data"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:layout_constraintBottom_toTopOf="@+id/live_button"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/RespeckStatus"
+            android:layout_width="117dp"
+            android:layout_height="29dp"
+            android:layout_marginStart="190dp"
+            android:layout_marginTop="512dp"
+            android:text="Disconnected"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/red"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/live_button"
-            android:layout_width="550px"
+        <TextView
+            android:id="@+id/ThingyStatus"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100px"
-            android:background="#03A9F4"
-            android:text="Watch live processing"
-            android:textColor="#FFFFFF"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="190dp"
+            android:layout_marginTop="557dp"
+            android:text="Disconnected"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#F44336"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/record_button"
-            app:layout_constraintBottom_toTopOf="@+id/ble_button"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
-
-        <Button
-            android:id="@+id/ble_button"
-            android:layout_width="550px"
+        <TextView
+            android:id="@+id/RespeckMain"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect sensors"
-            android:layout_marginTop="100px"
-            android:layout_marginBottom="100px"
-            android:background="#03A9F4"
-            android:textColor="#FFFFFF"
-            app:layout_constraintTop_toBottomOf="@+id/live_button"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="512dp"
+            android:text="Respeck Status: "
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#150E0E"
+            app:layout_constraintEnd_toStartOf="@+id/RespeckStatus"
+            app:layout_constraintHorizontal_bias="0.027"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="33dp"
+            android:layout_marginTop="556dp"
+            android:text="Thingy Status: "
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#0E0808"
+            app:layout_constraintEnd_toStartOf="@+id/ThingyStatus"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/RecoginsedMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="34dp"
+            android:layout_marginTop="604dp"
+            android:text="Recognised Activity:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#151414"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/activity_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="217dp"
+            android:layout_marginTop="604dp"
+            android:autoText="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#3F51B5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -22,16 +23,20 @@ import com.specknet.pdiotapp.utils.Constants
 import com.specknet.pdiotapp.utils.RESpeckLiveData
 import com.specknet.pdiotapp.utils.ThingyLiveData
 import org.tensorflow.lite.Interpreter
+import org.w3c.dom.Text
 import java.io.FileInputStream
 import java.io.IOException
+import java.lang.Math.sqrt
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.collections.ArrayList
+import kotlin.math.sqrt
 
 
 class LiveDataActivity : AppCompatActivity() {
 
-
+    /*var lastMagnitude = 0.0f
+    var stepCount = 0*/
 
     var inputValue = Array(1) {
         Array(50) {
@@ -46,8 +51,13 @@ class LiveDataActivity : AppCompatActivity() {
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
 
-    //textview
+    //textviews
     lateinit var respeckTextView: TextView
+    //lateinit var mainPageTextView: TextView
+    //lateinit var respeckStatus: TextView
+    //lateinit var thingyStatus: TextView
+    //lateinit var stepCountView: TextView
+
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
     lateinit var dataSet_res_accel_y: LineDataSet
@@ -85,10 +95,36 @@ class LiveDataActivity : AppCompatActivity() {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
+    /*fun stepCounterWalking(x: Float, y: Float, z: Float){
+        val magnitude = sqrt((x*x + y*y + z*z))
+        val delta = lastMagnitude - magnitude
+        lastMagnitude = magnitude
+
+        if(delta > 6) stepCount++
+    }
+
+    fun stepCounterRunning(x: Float, y: Float, z: Float){
+        val magnitude = sqrt(x*x + y*y + z*z)
+        val delta = lastMagnitude - magnitude
+        lastMagnitude = magnitude
+
+        if(delta > 10) stepCount++
+    }*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //to update the live data layout
         setContentView(R.layout.activity_live_data)
-        respeckTextView = findViewById(R.id.recognizedActivityRespeck) as TextView
+        respeckTextView = findViewById<TextView>(R.id.recognizedActivityRespeck)
+        //stepCountView = findViewById<TextView>(R.id.stepCount)
+
+        //update main layout text
+        /*setContentView(R.layout.activity_main)
+        mainPageTextView = findViewById<TextView>(R.id.ActivityMain)
+        respeckStatus  = findViewById<TextView>(R.id.RespeckStatus)
+        thingyStatus = findViewById<TextView>(R.id.ThingyStatus)*/
+
         setupCharts()
 
         tflite = Interpreter(loadModelFile())
@@ -119,11 +155,41 @@ class LiveDataActivity : AppCompatActivity() {
                         tflite.run(inputValue, outputValue)
                         Log.i("Predicted live data", outputValue.contentDeepToString())
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
-                        if(maxIdx == 0) respeckTextView.text = "Recognised activity: Falling"
-                        if(maxIdx == 1) respeckTextView.text = "Recognised activity: Sitting/Standing"
-                        if(maxIdx == 2) respeckTextView.text = "Recognised activity: Lying down"
-                        if(maxIdx == 3) respeckTextView.text = "Recognised activity: Walking"
-                        if(maxIdx == 4) respeckTextView.text = "Recognised activity: Running"
+
+                        when(maxIdx) {
+                            0 -> {
+                                respeckTextView.text = "You are currently: Falling"
+                                //mainPageTextView.text = "Recognised activity: Falling"
+                            }
+                            1 -> {
+                                respeckTextView.text = "You are currently: Sitting/Standing"
+                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                            }
+                            2 -> {
+                                respeckTextView.text = "You are currently: Lying down"
+                                //mainPageTextView.text = "Recognised activity: Lying down"
+                            }
+                            3 -> {
+                                respeckTextView.text = "You are currently: Walking"
+                                //mainPageTextView.text = "Recognised activity: Walking"
+                                /*stepCounterWalking(x,y,z)
+                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                                stepCountView.text = currentCount.toString()*/
+
+                            }
+                            4 -> {
+                                respeckTextView.text = "You are currently: Running"
+                                //mainPageTextView.text = "Recognised activity: Running"
+                                /*stepCounterRunning(x,y,z)
+                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                                stepCountView.text = currentCount.toString()*/
+                            }
+                            else -> {
+                                respeckTextView.text = "You are currently: General Movement"
+                                //mainPageTextView.text = "Recognised activity: General Movement"
+                            }
+                        }
+
 
                         // only reset half of the buffer to make a one second sliding window
                         inputValue[0].drop(25)
@@ -151,6 +217,10 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("respeck", x, y, z)
 
                 }
+                /*else{
+                    respeckStatus.text = "Disconnected"
+                    respeckStatus.setTextColor(Color.parseColor("#ff0000"))
+                }*/
             }
         }
 
@@ -170,6 +240,8 @@ class LiveDataActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_THINGY_BROADCAST) {
+                    //thingyStatus.text = "Connected"
+                    //thingyStatus.setTextColor(Color.parseColor("#008000"))
 
                     val liveData =
                         intent.getSerializableExtra(Constants.THINGY_LIVE_DATA) as ThingyLiveData
@@ -184,6 +256,11 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("thingy", x, y, z)
 
                 }
+                /*else{
+                    thingyStatus.text = "Disconnected"
+                    thingyStatus.setTextColor(Color.parseColor("#ff0000"))
+
+                }*/
             }
         }
 
