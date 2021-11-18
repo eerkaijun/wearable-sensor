@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     //text view
     lateinit var activityMainTextView: TextView
+    //lateinit var respeckStatus : TextView
     // permissions
     lateinit var permissionAlertDialog: AlertDialog.Builder
 
@@ -108,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         pairingButton = findViewById(R.id.ble_button)
         recordButton = findViewById(R.id.record_button)
         activityMainTextView = findViewById<TextView>(R.id.activity_test)
+        //respeckStatus = findViewById<TextView>()
 
         permissionAlertDialog = AlertDialog.Builder(this)
 
@@ -133,8 +135,8 @@ class MainActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
-                    /*respeckStatus.text = "Connected"
-                    respeckStatus.setTextColor(Color.parseColor("#008000"))*/
+                    //respeckStatus.text = "Connected"
+                    //respeckStatus.setTextColor(Color.parseColor("#008000"))
 
                     val liveData =
                             intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
@@ -151,38 +153,57 @@ class MainActivity : AppCompatActivity() {
                     if (bufferCount >= 50) {
                         // do model prediction
                         tflite.run(inputValue, outputValue)
-                        Log.i("Predicted live data", outputValue.contentDeepToString())
+                        Log.i("Predicted live data in main activity", outputValue.contentDeepToString())
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
 
-                        when(maxIdx) {
-                            0 -> {
-                                activityMainTextView.text = "Falling"
-                                //mainPageTextView.text = "Recognised activity: Falling"
-                            }
-                            1 -> {
-                                activityMainTextView.text = "Sitting/Standing"
-                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
-                            }
-                            2 -> {
-                                activityMainTextView.text = "Lying down"
-                                //mainPageTextView.text = "Recognised activity: Lying down"
-                            }
-                            3 -> {
-                                activityMainTextView.text = "Walking"
-                                //mainPageTextView.text = "Recognised activity: Walking"
-                                /*stepCounterWalking(x,y,z)
+                        //try {
+                            when (maxIdx) {
+                                0 -> {
+                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                        activityMainTextView.text = "Falling"
+                                    })
+                                    //activityMainTextView.text = "Falling"
+                                    //mainPageTextView.text = "Recognised activity: Falling"
+                                }
+                                1 -> {
+                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                        activityMainTextView.text = "Sitting/Standing"
+                                    })
+                                    //activityMainTextView.text = "Sitting/Standing"
+                                    //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                                }
+                                2 -> {
+                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                        activityMainTextView.text = "Lying down"
+                                    })
+                                    //activityMainTextView.text = "Lying down"
+                                    //mainPageTextView.text = "Recognised activity: Lying down"
+                                }
+                                3 -> {
+                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                        activityMainTextView.text = "Walking"
+                                    })
+                                    //activityMainTextView.text = "Walking"
+                                    //mainPageTextView.text = "Recognised activity: Walking"
+                                    /*stepCounterWalking(x,y,z)
                                 var currentCount  = stepCountView.text.toString().toInt() + stepCount
                                 stepCountView.text = currentCount.toString()*/
 
-                            }
-                            4 -> {
-                                activityMainTextView.text = "Running"
-                                //mainPageTextView.text = "Recognised activity: Running"
-                                /*stepCounterRunning(x,y,z)
+                                }
+                                4 -> {
+                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                        activityMainTextView.text = "Running"
+                                    })
+                                    //activityMainTextView.text = "Running"
+                                    //mainPageTextView.text = "Recognised activity: Running"
+                                    /*stepCounterRunning(x,y,z)
                                 var currentCount  = stepCountView.text.toString().toInt() + stepCount
                                 stepCountView.text = currentCount.toString()*/
+                                }
                             }
-                        }
+                        //} catch(ex: Exception) {
+                        //    Log.d("ERRORRRRRRRRRRRR", ex.toString())
+                        //}
 
 
                         // only reset half of the buffer to make a one second sliding window

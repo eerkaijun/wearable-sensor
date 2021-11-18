@@ -139,8 +139,6 @@ class LiveDataActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
-                    /*respeckStatus.text = "Connected"
-                    respeckStatus.setTextColor(Color.parseColor("#008000"))*/
 
                     val liveData =
                         intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
