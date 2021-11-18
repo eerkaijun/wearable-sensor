@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
@@ -23,10 +23,8 @@ import com.specknet.pdiotapp.utils.Constants
 import com.specknet.pdiotapp.utils.RESpeckLiveData
 import com.specknet.pdiotapp.utils.ThingyLiveData
 import org.tensorflow.lite.Interpreter
-import org.w3c.dom.Text
 import java.io.FileInputStream
 import java.io.IOException
-import java.lang.Math.sqrt
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.collections.ArrayList
@@ -35,8 +33,8 @@ import kotlin.math.sqrt
 
 class LiveDataActivity : AppCompatActivity() {
 
-    /*var lastMagnitude = 0.0f
-    var stepCount = 0*/
+    var lastMagnitude = 0.0f
+    var stepCount = 0
 
     var inputValue = Array(1) {
         Array(50) {
@@ -53,11 +51,9 @@ class LiveDataActivity : AppCompatActivity() {
 
     //textviews
     lateinit var respeckTextView: TextView
-    //lateinit var mainPageTextView: TextView
-    //lateinit var respeckStatus: TextView
-    //lateinit var thingyStatus: TextView
-    //lateinit var stepCountView: TextView
+    lateinit var stepCountView: TextView
 
+    lateinit var imageView: ImageView
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
     lateinit var dataSet_res_accel_y: LineDataSet
@@ -95,15 +91,15 @@ class LiveDataActivity : AppCompatActivity() {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    /*fun stepCounterWalking(x: Float, y: Float, z: Float){
+    fun stepCounterWalking(x: Float, y: Float, z: Float){
         val magnitude = sqrt((x*x + y*y + z*z))
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
-        if(delta > 6) stepCount++
+        if(delta > 1.02 && delta < 1.05)  stepCount++
     }
 
-    fun stepCounterRunning(x: Float, y: Float, z: Float){
+    /*fun stepCounterRunning(x: Float, y: Float, z: Float){
         val magnitude = sqrt(x*x + y*y + z*z)
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
@@ -116,14 +112,9 @@ class LiveDataActivity : AppCompatActivity() {
 
         //to update the live data layout
         setContentView(R.layout.activity_live_data)
-        respeckTextView = findViewById<TextView>(R.id.recognizedActivityRespeck)
-        //stepCountView = findViewById<TextView>(R.id.stepCount)
-
-        //update main layout text
-        /*setContentView(R.layout.activity_main)
-        mainPageTextView = findViewById<TextView>(R.id.ActivityMain)
-        respeckStatus  = findViewById<TextView>(R.id.RespeckStatus)
-        thingyStatus = findViewById<TextView>(R.id.ThingyStatus)*/
+        respeckTextView = findViewById<TextView>(R.id.recognisedActivity)
+        stepCountView = findViewById<TextView>(R.id.stepCounter)
+        imageView = findViewById<ImageView>(R.id.activityIcon)
 
         setupCharts()
 
@@ -148,6 +139,7 @@ class LiveDataActivity : AppCompatActivity() {
                     val x = liveData.accelX
                     val y = liveData.accelY
                     val z = liveData.accelZ
+                    stepCounterWalking(x,y,z)
 
                     // Build a buffer with intervals of 2 seconds (25Hz)
                     if (bufferCount >= 50) {
@@ -158,35 +150,34 @@ class LiveDataActivity : AppCompatActivity() {
 
                         when(maxIdx) {
                             0 -> {
-                                respeckTextView.text = "You are currently: Falling"
+                                respeckTextView.text = "Falling"
                                 //mainPageTextView.text = "Recognised activity: Falling"
                             }
                             1 -> {
-                                respeckTextView.text = "You are currently: Sitting/Standing"
+                                respeckTextView.text = "Sitting/Standing"
+                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    imageView.setImageResource(R.drawable.record_live)
+                                })
                                 //mainPageTextView.text = "Recognised activity: Sitting/Standing"
                             }
                             2 -> {
-                                respeckTextView.text = "You are currently: Lying down"
+                                respeckTextView.text = "Lying down"
                                 //mainPageTextView.text = "Recognised activity: Lying down"
                             }
                             3 -> {
-                                respeckTextView.text = "You are currently: Walking"
+                                respeckTextView.text = "Walking"
                                 //mainPageTextView.text = "Recognised activity: Walking"
-                                /*stepCounterWalking(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
+                                Log.i("DEBUG", stepCount.toString())
+                                //stepCountView.text = stepCount.toString()
+
 
                             }
                             4 -> {
-                                respeckTextView.text = "You are currently: Running"
+                                respeckTextView.text = "Running"
+                                Log.i("DEBUG", stepCount.toString())
+                                //stepCountView.text = stepCount.toString()
+
                                 //mainPageTextView.text = "Recognised activity: Running"
-                                /*stepCounterRunning(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
-                            }
-                            else -> {
-                                respeckTextView.text = "You are currently: General Movement"
-                                //mainPageTextView.text = "Recognised activity: General Movement"
                             }
                         }
 

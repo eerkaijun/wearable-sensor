@@ -7,38 +7,27 @@
     tools:context=".live.LiveDataActivity">
 
     <TextView
-        android:id="@+id/recognizedActivityRespeck"
+        android:id="@+id/activityRespeckLabel"
         android:layout_width="381dp"
         android:layout_height="32dp"
-        android:layout_marginEnd="19dp"
+        android:layout_marginBottom="76dp"
         android:text="You are currently:"
-        android:textAlignment="center"
+        android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="35dp" />
+        app:layout_constraintBottom_toTopOf="@+id/activityIcon"
+        tools:layout_editor_absoluteX="30dp" />
 
     <LinearLayout
         android:id="@+id/respeck_graphs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="104dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/thingy_graphs"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Respeck Live Data" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/respeck_chart"
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-        </com.github.mikephil.charting.charts.LineChart>
 
     </LinearLayout>
 
@@ -50,22 +39,105 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/respeck_graphs">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thingy Live Data" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/thingy_chart"
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-        </com.github.mikephil.charting.charts.LineChart>
+        app:layout_constraintTop_toTopOf="parent">
 
 
     </LinearLayout>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/thingy_chart"
+        android:layout_width="413dp"
+        android:layout_height="179dp"
+        android:layout_marginTop="488dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.github.mikephil.charting.charts.LineChart>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="460dp"
+        android:text="Thingy Live Data"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/respeck_chart"
+        android:layout_width="412dp"
+        android:layout_height="177dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="196dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.github.mikephil.charting.charts.LineChart>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="165dp"
+        android:text="Respeck Live Data"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="128dp"
+        android:text="Step Count: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/stepCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="57dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintEnd_toStartOf="@+id/activityIcon"
+        tools:layout_editor_absoluteY="128dp"
+        tools:text="0" />
+
+    <ImageView
+        android:id="@+id/activityIcon"
+        android:layout_width="93dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="128dp"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/connect_icon" />
+
+    <TextView
+        android:id="@+id/recognisedActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginEnd="236dp"
+        android:layout_marginBottom="18dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toTopOf="@+id/activityIcon"
+        app:layout_constraintEnd_toStartOf="@+id/activityIcon"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="4dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
