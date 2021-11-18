@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -62,7 +63,8 @@ class MainActivity : AppCompatActivity() {
 
     //text view
     lateinit var activityMainTextView: TextView
-    //lateinit var respeckStatus : TextView
+    lateinit var respeckStatus : TextView
+    lateinit var thingyStatus: TextView
     // permissions
     lateinit var permissionAlertDialog: AlertDialog.Builder
 
@@ -109,7 +111,8 @@ class MainActivity : AppCompatActivity() {
         pairingButton = findViewById(R.id.ble_button)
         recordButton = findViewById(R.id.record_button)
         activityMainTextView = findViewById<TextView>(R.id.activity_test)
-        //respeckStatus = findViewById<TextView>()
+        respeckStatus = findViewById<TextView>(R.id.RespeckStatus)
+        thingyStatus = findViewById<TextView>(R.id.ThingyStatus)
 
         permissionAlertDialog = AlertDialog.Builder(this)
 
@@ -135,8 +138,10 @@ class MainActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
-                    //respeckStatus.text = "Connected"
-                    //respeckStatus.setTextColor(Color.parseColor("#008000"))
+                    this@MainActivity.runOnUiThread(java.lang.Runnable {
+                        respeckStatus.text = "Connected"
+                        respeckStatus.setTextColor(Color.parseColor("#008000"))
+                    })
 
                     val liveData =
                             intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
@@ -228,12 +233,7 @@ class MainActivity : AppCompatActivity() {
                     bufferCount += 1
                     Log.i("Current buffer content", inputValue.contentDeepToString());
 
-
                 }
-                /*else{
-                    respeckStatus.text = "Disconnected"
-                    respeckStatus.setTextColor(Color.parseColor("#ff0000"))
-                }*/
             }
         }
 
