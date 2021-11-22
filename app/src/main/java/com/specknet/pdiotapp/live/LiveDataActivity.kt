@@ -26,11 +26,13 @@ import org.tensorflow.lite.Interpreter
 import org.w3c.dom.Text
 import java.io.FileInputStream
 import java.io.IOException
-import java.lang.Math.sqrt
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.math.acos
+import kotlin.math.PI
 
 
 class LiveDataActivity : AppCompatActivity() {
@@ -162,12 +164,85 @@ class LiveDataActivity : AppCompatActivity() {
                                 //mainPageTextView.text = "Recognised activity: Falling"
                             }
                             1 -> {
-                                respeckTextView.text = "You are currently: Sitting/Standing"
-                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                                var sumGyroY = 0.0
+                                var countGyroY = 0
+
+                                var sumX = inputValue[0][0][0]
+                                var sumY = inputValue[0][0][1]
+                                var sumZ = inputValue[0][0][2]
+                                for (i in 1..49) {
+                                    sumX += inputValue[0][i][0]
+                                    sumY += inputValue[0][i][1]
+                                    sumZ += inputValue[0][i][2]
+                                    if (inputValue[0][i][4] > -10 && inputValue[0][i][4] < 10){
+                                        sumGyroY += inputValue[0][i][4]
+                                        countGyroY += 1
+                                    }
+                                }
+                                val meanX = sumX / 50
+                                val meanY = sumY / 50
+                                val meanZ = sumZ / 50
+                                val meanGyroY = sumGyroY / countGyroY
+
+                                var stdX = (inputValue[0][0][0] - meanX).pow(2)
+                                var stdZ = (inputValue[0][0][2] - meanZ).pow(2)
+                                for (i in 1..49) {
+                                    stdX += (inputValue[0][i][0] - meanX).pow(2)
+                                    stdZ += (inputValue[0][i][2] - meanZ).pow(2)
+                                }
+                                stdX = sqrt(stdX / 50)
+                                stdZ = sqrt(stdZ / 50)
+
+                                val cosThetaZ = meanZ / (sqrt(meanX.pow(2) + meanY.pow(2) + meanZ.pow(2)))
+                                val thetaZ = acos(cosThetaZ) * 180 / PI
+
+                                if (stdX + stdZ > 0.0) {
+                                    respeckTextView.text = "You are currently: Doing Desk Work"
+                                } else {
+                                    if (thetaZ > 85.0 && thetaZ < 95.0) {
+                                        if (meanGyroY <= 0.85) {
+                                            respeckTextView.text = "You are currently: Sitting"
+                                        } else {
+                                            respeckTextView.text = "You are currently: Standing"
+                                        }
+                                    } else if (thetaZ > 0.0 && thetaZ < 85.0) {
+                                        respeckTextView.text = "You are currently: Sitting bent backward"
+                                    } else if (thetaZ > 95.0 && thetaZ < 180.0) {
+                                        respeckTextView.text = "You are currently: Sitting bent forward"
+                                    } else {
+                                        respeckTextView.text = "You are currently: Doing Desk Work"
+                                    }
+                                }
+
                             }
                             2 -> {
-                                respeckTextView.text = "You are currently: Lying down"
-                                //mainPageTextView.text = "Recognised activity: Lying down"
+                                var sumX = inputValue[0][0][0]
+                                var sumY = inputValue[0][0][1]
+                                var sumZ = inputValue[0][0][2]
+                                for (i in 1..49) {
+                                    sumX += inputValue[0][i][0]
+                                    sumY += inputValue[0][i][1]
+                                    sumZ += inputValue[0][i][2]
+                                }
+                                val meanX = sumX / 50
+                                val meanY = sumY / 50
+                                val meanZ = sumZ / 50
+                                val cosThetaZ = meanZ / (sqrt(meanX.pow(2) + meanY.pow(2) + meanZ.pow(2)))
+                                val thetaZ = acos(cosThetaZ) * 180 / PI
+
+                                if (thetaZ in 0.0..45.0) {
+                                    respeckTextView.text = "You are currently: Lying Down on Back"
+                                } else if (thetaZ > 45 && thetaZ <= 90) {
+                                    respeckTextView.text = "You are currently: Lying Down on Right"
+                                } else if (thetaZ > 90 && thetaZ <= 135) {
+                                    respeckTextView.text = "You are currently: Lying Down on Left"
+                                } else if (thetaZ > 135 && thetaZ <= 180) {
+                                    respeckTextView.text = "You are currently: Lying Down on Stomach"
+                                } else {
+                                    respeckTextView.text = "You are currently: Lying Down on Back"
+                                }
+
+                                //respeckTextView.text = "You are currently: Lying down"
                             }
                             3 -> {
                                 respeckTextView.text = "You are currently: Walking"
@@ -271,6 +346,23 @@ class LiveDataActivity : AppCompatActivity() {
         val handlerThingy = Handler(looperThingy)
         this.registerReceiver(thingyLiveUpdateReceiver, filterTestThingy, null, handlerThingy)
 
+    }
+
+    fun calculateSD(numArray: FloatArray): Double {
+        var sum = 0.0
+        var standardDeviation = 0.0
+
+        for (num in numArray) {
+            sum += num
+        }
+
+        val mean = sum / 10
+
+        for (num in numArray) {
+            standardDeviation += (num-mean).pow(2.0)
+        }
+
+        return sqrt(standardDeviation / 10)
     }
 
 
