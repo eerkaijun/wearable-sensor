@@ -96,16 +96,16 @@ class LiveDataActivity : AppCompatActivity() {
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
-        if(delta > 1.5)  stepCount++
+        if(delta > 1.00002)  stepCount++
     }
 
-    /*fun stepCounterRunning(x: Float, y: Float, z: Float){
+    fun stepCounterRunning(x: Float, y: Float, z: Float){
         val magnitude = sqrt(x*x + y*y + z*z)
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
         if(delta > 10) stepCount++
-    }*/
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,7 +139,6 @@ class LiveDataActivity : AppCompatActivity() {
                     val x = liveData.accelX
                     val y = liveData.accelY
                     val z = liveData.accelZ
-                    stepCounterWalking(x,y,z)
 
                     // Build a buffer with intervals of 2 seconds (25Hz)
                     if (bufferCount >= 50) {
@@ -150,42 +149,38 @@ class LiveDataActivity : AppCompatActivity() {
 
                         when(maxIdx) {
                             0 -> {
-                                respeckTextView.text = "Falling"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.falling_icon)
+                                    respeckTextView.text = "Falling"
+                                    imageView.setBackgroundResource(R.drawable.falling_icon)
                                 })
                             }
                             1 -> {
-                                respeckTextView.text = "Sitting/Standing"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.sitting_icon)
+                                    respeckTextView.text = "Sitting/Standing"
+                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
                             }
                             2 -> {
-                                respeckTextView.text = "Lying down"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.lyingdown_icon)
+                                    respeckTextView.text = "Lying down"
+                                    imageView.setBackgroundResource(R.drawable.lyingdown_icon)
                                 })
                             }
                             3 -> {
-                                respeckTextView.text = "Walking"
-                                Log.i("DEBUG", stepCount.toString())
+                                stepCounterWalking(x,y,z)
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.walking_icon)
+                                    respeckTextView.text = "Walking"
+                                    imageView.setBackgroundResource(R.drawable.walking_icon)
+                                    stepCountView.text = stepCount.toString()
                                 })
-                                //stepCountView.text = stepCount.toString()
-
-
+                                Log.i("DEBUG", stepCount.toString())
                             }
                             4 -> {
-                                respeckTextView.text = "Running"
-                                Log.i("DEBUG", stepCount.toString())
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.running_icon)
+                                    respeckTextView.text = "Running"
+                                    imageView.setBackgroundResource(R.drawable.running_icon)
                                 })
-                                //stepCountView.text = stepCount.toString()
-
-                                //mainPageTextView.text = "Recognised activity: Running"
+                                Log.i("DEBUG", stepCount.toString())
                             }
                         }
 
@@ -216,10 +211,7 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("respeck", x, y, z)
 
                 }
-                /*else{
-                    respeckStatus.text = "Disconnected"
-                    respeckStatus.setTextColor(Color.parseColor("#ff0000"))
-                }*/
+
             }
         }
 
