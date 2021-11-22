@@ -44,8 +44,12 @@ class MainActivity : AppCompatActivity() {
     val filterTestRespeck = IntentFilter(Constants.ACTION_RESPECK_LIVE_BROADCAST)
 
     var inputValue = Array(1) {
-        Array(50) {
-            FloatArray(6)
+        Array(2) {
+            Array(1) {
+                Array(25) {
+                    FloatArray(6)
+                }
+            }
         }
     }
     var outputValue = Array(1) {
@@ -83,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun loadModelFile(): MappedByteBuffer {
         // val assets: AssetManager = this.getAssets()
-        val fileDescriptor = this.assets.openFd("model_cnn.tflite")
+        val fileDescriptor = this.assets.openFd("model_conv_lstm.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -129,6 +133,9 @@ class MainActivity : AppCompatActivity() {
         tflite = Interpreter(loadModelFile())
         Log.i("READ MODEL IN MAIN ", "SUCCESSFUL")
 
+        tflite.run(inputValue, outputValue)
+        Log.i("BEFORE EVERYTHING", outputValue.contentDeepToString())
+
         // set up the broadcast receiver
         respeckLiveUpdateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -137,6 +144,7 @@ class MainActivity : AppCompatActivity() {
 
                 val action = intent.action
 
+                /*
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
                         respeckStatus.text = "Connected"
@@ -144,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                     })
 
                     val liveData =
-                            intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
+                        intent.getSerializableExtra(Constants.RESPECK_LIVE_DATA) as RESpeckLiveData
                     Log.d("Live", "onReceive: liveData = " + liveData)
 
                     // get all relevant intent contents
@@ -162,57 +170,57 @@ class MainActivity : AppCompatActivity() {
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
 
                         //try {
-                            when (maxIdx) {
-                                0 -> {
-                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                                        activityMainTextView.text = "Falling"
-                                    })
-                                    //activityMainTextView.text = "Falling"
-                                    //mainPageTextView.text = "Recognised activity: Falling"
-                                }
-                                1 -> {
-                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                                        activityMainTextView.text = "Sitting/Standing"
-                                    })
-                                    //activityMainTextView.text = "Sitting/Standing"
-                                    //mainPageTextView.text = "Recognised activity: Sitting/Standing"
-                                }
-                                2 -> {
-                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                                        activityMainTextView.text = "Lying down"
-                                    })
-                                    //activityMainTextView.text = "Lying down"
-                                    //mainPageTextView.text = "Recognised activity: Lying down"
-                                }
-                                3 -> {
-                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                                        activityMainTextView.text = "Walking"
-                                    })
-                                    //activityMainTextView.text = "Walking"
-                                    //mainPageTextView.text = "Recognised activity: Walking"
-                                    /*stepCounterWalking(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
-
-                                }
-                                4 -> {
-                                    this@MainActivity.runOnUiThread(java.lang.Runnable {
-                                        activityMainTextView.text = "Running"
-                                    })
-                                    //activityMainTextView.text = "Running"
-                                    //mainPageTextView.text = "Recognised activity: Running"
-                                    /*stepCounterRunning(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
-                                }
+                        when (maxIdx) {
+                            0 -> {
+                                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                    activityMainTextView.text = "Falling"
+                                })
+                                //activityMainTextView.text = "Falling"
+                                //mainPageTextView.text = "Recognised activity: Falling"
                             }
+                            1 -> {
+                                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                    activityMainTextView.text = "Sitting/Standing"
+                                })
+                                //activityMainTextView.text = "Sitting/Standing"
+                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+                            }
+                            2 -> {
+                                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                    activityMainTextView.text = "Lying down"
+                                })
+                                //activityMainTextView.text = "Lying down"
+                                //mainPageTextView.text = "Recognised activity: Lying down"
+                            }
+                            3 -> {
+                                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                    activityMainTextView.text = "Walking"
+                                })
+                                //activityMainTextView.text = "Walking"
+                                //mainPageTextView.text = "Recognised activity: Walking"
+                                /*stepCounterWalking(x,y,z)
+                            var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                            stepCountView.text = currentCount.toString()*/
+
+                            }
+                            4 -> {
+                                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                    activityMainTextView.text = "Running"
+                                })
+                                //activityMainTextView.text = "Running"
+                                //mainPageTextView.text = "Recognised activity: Running"
+                                /*stepCounterRunning(x,y,z)
+                            var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                            stepCountView.text = currentCount.toString()*/
+                            }
+                        }
                         //} catch(ex: Exception) {
                         //    Log.d("ERRORRRRRRRRRRRR", ex.toString())
                         //}
 
 
                         // only reset half of the buffer to make a one second sliding window
-                        inputValue[0].drop(25)
+                        inputValue[0][0][0].drop(25)
                         //Log.i("Buffer after resetting", inputValue.contentDeepToString());
                         //Log.i("Length of buffer after resetting", inputValue.size.toString());
                         /*
@@ -223,17 +231,17 @@ class MainActivity : AppCompatActivity() {
                         }*/
                         bufferCount = 25
                     }
-                    inputValue[0][bufferCount][0] = x
-                    inputValue[0][bufferCount][1] = y
-                    inputValue[0][bufferCount][2] = z
-                    inputValue[0][bufferCount][3] = liveData.gyro.x
-                    inputValue[0][bufferCount][4] = liveData.gyro.y
-                    inputValue[0][bufferCount][5] = liveData.gyro.z
+                    inputValue[0][0][0][bufferCount][0] = x
+                    inputValue[0][0][0][bufferCount][1] = y
+                    inputValue[0][0][0][bufferCount][2] = z
+                    inputValue[0][0][0][bufferCount][3] = liveData.gyro.x
+                    inputValue[0][0][0][bufferCount][4] = liveData.gyro.y
+                    inputValue[0][0][0][bufferCount][5] = liveData.gyro.z
 
                     bufferCount += 1
                     Log.i("Current buffer content", inputValue.contentDeepToString());
 
-                }
+                }*/
             }
         }
 
