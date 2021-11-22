@@ -96,7 +96,7 @@ class LiveDataActivity : AppCompatActivity() {
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
-        if(delta > 1.02 && delta < 1.05)  stepCount++
+        if(delta > 1.5)  stepCount++
     }
 
     /*fun stepCounterRunning(x: Float, y: Float, z: Float){
@@ -151,23 +151,28 @@ class LiveDataActivity : AppCompatActivity() {
                         when(maxIdx) {
                             0 -> {
                                 respeckTextView.text = "Falling"
-                                //mainPageTextView.text = "Recognised activity: Falling"
+                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    imageView.setImageResource(R.drawable.falling_icon)
+                                })
                             }
                             1 -> {
                                 respeckTextView.text = "Sitting/Standing"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    imageView.setImageResource(R.drawable.record_live)
+                                    imageView.setImageResource(R.drawable.sitting_icon)
                                 })
-                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
                             }
                             2 -> {
                                 respeckTextView.text = "Lying down"
-                                //mainPageTextView.text = "Recognised activity: Lying down"
+                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    imageView.setImageResource(R.drawable.lyingdown_icon)
+                                })
                             }
                             3 -> {
                                 respeckTextView.text = "Walking"
-                                //mainPageTextView.text = "Recognised activity: Walking"
                                 Log.i("DEBUG", stepCount.toString())
+                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    imageView.setImageResource(R.drawable.walking_icon)
+                                })
                                 //stepCountView.text = stepCount.toString()
 
 
@@ -175,6 +180,9 @@ class LiveDataActivity : AppCompatActivity() {
                             4 -> {
                                 respeckTextView.text = "Running"
                                 Log.i("DEBUG", stepCount.toString())
+                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    imageView.setImageResource(R.drawable.running_icon)
+                                })
                                 //stepCountView.text = stepCount.toString()
 
                                 //mainPageTextView.text = "Recognised activity: Running"
