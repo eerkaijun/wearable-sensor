@@ -133,18 +133,16 @@ class MainActivity : AppCompatActivity() {
         tflite = Interpreter(loadModelFile())
         Log.i("READ MODEL IN MAIN ", "SUCCESSFUL")
 
-        tflite.run(inputValue, outputValue)
-        Log.i("BEFORE EVERYTHING", outputValue.contentDeepToString())
-
         // set up the broadcast receiver
         respeckLiveUpdateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
 
                 Log.i("thread", "I am running on thread = " + Thread.currentThread().name)
+                //tflite.run(inputValue, outputValue)
+                //Log.i("BEFORE EVERYTHING", outputValue.contentDeepToString())
 
                 val action = intent.action
 
-                /*
                 if (action == Constants.ACTION_RESPECK_LIVE_BROADCAST) {
                     this@MainActivity.runOnUiThread(java.lang.Runnable {
                         respeckStatus.text = "Connected"
@@ -163,7 +161,7 @@ class MainActivity : AppCompatActivity() {
 
 
                     // Build a buffer with intervals of 2 seconds (25Hz)
-                    if (bufferCount >= 50) {
+                    if (bufferCount >= 25) {
                         // do model prediction
                         tflite.run(inputValue, outputValue)
                         Log.i("Predicted live data in main activity", outputValue.contentDeepToString())
@@ -220,7 +218,9 @@ class MainActivity : AppCompatActivity() {
 
 
                         // only reset half of the buffer to make a one second sliding window
-                        inputValue[0][0][0].drop(25)
+                        val temp = inputValue[0][1][0]
+                        inputValue[0][0][0] = temp
+                        //inputValue[0][0][0].drop(25)
                         //Log.i("Buffer after resetting", inputValue.contentDeepToString());
                         //Log.i("Length of buffer after resetting", inputValue.size.toString());
                         /*
@@ -229,19 +229,21 @@ class MainActivity : AppCompatActivity() {
                                 FloatArray(6)
                             }
                         }*/
-                        bufferCount = 25
+                        bufferCount = 0
                     }
-                    inputValue[0][0][0][bufferCount][0] = x
-                    inputValue[0][0][0][bufferCount][1] = y
-                    inputValue[0][0][0][bufferCount][2] = z
-                    inputValue[0][0][0][bufferCount][3] = liveData.gyro.x
-                    inputValue[0][0][0][bufferCount][4] = liveData.gyro.y
-                    inputValue[0][0][0][bufferCount][5] = liveData.gyro.z
+
+                    // shape (1, 2, 1, 25, 6)
+                    inputValue[0][1][0][bufferCount][0] = x
+                    inputValue[0][1][0][bufferCount][1] = y
+                    inputValue[0][1][0][bufferCount][2] = z
+                    inputValue[0][1][0][bufferCount][3] = liveData.gyro.x
+                    inputValue[0][1][0][bufferCount][4] = liveData.gyro.y
+                    inputValue[0][1][0][bufferCount][5] = liveData.gyro.z
 
                     bufferCount += 1
                     Log.i("Current buffer content", inputValue.contentDeepToString());
 
-                }*/
+                }
             }
         }
 
