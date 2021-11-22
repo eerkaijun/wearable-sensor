@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".live.LiveDataActivity">
 
+    <TextView
+        android:id="@+id/recognizedActivityRespeck"
+        android:layout_width="381dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="19dp"
+        android:text="You are currently:"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="35dp" />
+
     <LinearLayout
         android:id="@+id/respeck_graphs"
         android:layout_width="match_parent"
@@ -24,14 +36,8 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/respeck_chart"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="200dp">
 
-            <TextView
-                android:id="@+id/recognizedActivityRespeck"
-                android:layout_width="0dp"
-                android:layout_height="21dp"
-                android:layout_marginTop="64dp"
-                android:text="Recognized activity:" />
         </com.github.mikephil.charting.charts.LineChart>
 
     </LinearLayout>
@@ -54,15 +60,8 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/thingy_chart"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="200dp">
 
-            <TextView
-                android:id="@+id/recognizedActivityThingy"
-                android:layout_width="205dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="60dp"
-                android:text="Recognized activity:" />
         </com.github.mikephil.charting.charts.LineChart>
 
 
