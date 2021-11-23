@@ -96,7 +96,7 @@ class LiveDataActivity : AppCompatActivity() {
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
-        if(delta > 1.00002)  stepCount++
+        if(delta > 0.957)  stepCount++
     }
 
     fun stepCounterRunning(x: Float, y: Float, z: Float){
@@ -104,7 +104,7 @@ class LiveDataActivity : AppCompatActivity() {
         val delta = lastMagnitude - magnitude
         lastMagnitude = magnitude
 
-        if(delta > 10) stepCount++
+        if(delta > 1.2) stepCount++
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,9 +176,11 @@ class LiveDataActivity : AppCompatActivity() {
                                 Log.i("DEBUG", stepCount.toString())
                             }
                             4 -> {
+                                stepCounterRunning(x,y,z)
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     respeckTextView.text = "Running"
                                     imageView.setBackgroundResource(R.drawable.running_icon)
+                                    stepCountView.text = stepCount.toString()
                                 })
                                 Log.i("DEBUG", stepCount.toString())
                             }

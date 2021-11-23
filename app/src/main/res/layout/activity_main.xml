@@ -20,7 +20,7 @@
             android:layout_height="92dp"
             android:layout_marginStart="48dp"
             android:layout_marginTop="68dp"
-            android:background="@drawable/connect_icon"
+            android:background="@drawable/ic_live_data_icon"
             android:backgroundTint="@color/indigo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
