@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -20,6 +22,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.specknet.pdiotapp.R
+import com.specknet.pdiotapp.R.drawable
 import com.specknet.pdiotapp.utils.Constants
 import com.specknet.pdiotapp.utils.RESpeckLiveData
 import com.specknet.pdiotapp.utils.ThingyLiveData
@@ -83,6 +86,7 @@ class LiveDataActivity : AppCompatActivity() {
 
     lateinit var respeckChart: LineChart
     lateinit var thingyChart: LineChart
+
 
     // global broadcast receiver so we can unregister it
     lateinit var respeckLiveUpdateReceiver: BroadcastReceiver
@@ -169,11 +173,17 @@ class LiveDataActivity : AppCompatActivity() {
                                 if (index == 0) text = "Falling on the left"
                                 else if (index == 1) text = "Falling on the right"
                                 else if (index == 2) text = "Falling on the back"
-                                else if (index == 3) text = "Falling on knees"
+                                else if (index == 3) {
+                                    text = "Falling on knees"
+                                    this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                        respeckTextView.text = text
+                                        imageView.setBackgroundResource(drawable.kneel_icon)
+                                    })
+                                }
                                 else text = "Falling"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     respeckTextView.text = text
-                                    imageView.setBackgroundResource(R.drawable.falling_icon)
+                                    imageView.setBackgroundResource(drawable.falling_icon)
                                 })
                             }
                             1 -> {
@@ -215,26 +225,40 @@ class LiveDataActivity : AppCompatActivity() {
                                 val thetaZ = acos(cosThetaZ) * 180 / PI
 
                                 if (stdX + stdZ > 0.04) {
-                                    text = "You are currently: Doing Desk Work"
+                                    this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                        respeckTextView.text = "Doing Desk Work"
+                                        imageView.setBackgroundResource(drawable.desk_icon)
+                                    })
                                 } else {
                                     if (thetaZ > 85.0 && thetaZ < 95.0) {
                                         if (meanGyroY <= 0.85) {
-                                            text = "You are currently: Sitting"
+                                            this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                                respeckTextView.text = "Sitting"
+                                                imageView.setBackgroundResource(drawable.sitting_icon)
+                                            })
                                         } else {
-                                            text = "You are currently: Standing"
+                                            this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                                respeckTextView.text = "Standing"
+                                                imageView.setBackgroundResource(drawable.standing_icon)
+                                            })
                                         }
                                     } else if (thetaZ > 0.0 && thetaZ < 85.0) {
-                                        text = "You are currently: Sitting bent backward"
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Sitting bent backward"
+                                            imageView.setBackgroundResource(drawable.sitting_icon)
+                                        })
                                     } else if (thetaZ > 95.0 && thetaZ < 180.0) {
-                                        text = "You are currently: Sitting bent forward"
-                                    } else {
-                                        text = "You are currently: Doing Desk Work"
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Sitting bent forward"
+                                            imageView.setBackgroundResource(drawable.sitting_icon)
+                                        })                                    }
+                                    else {
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Doing desk work"
+                                            imageView.setBackgroundResource(drawable.desk_icon)
+                                        })
                                     }
                                 }
-                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = text
-                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
-                                })
                             }
                             2 -> {
                                 var text = " "
@@ -267,7 +291,7 @@ class LiveDataActivity : AppCompatActivity() {
                                 }
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     respeckTextView.text = text
-                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
+                                    imageView.setBackgroundResource(drawable.lyingdown_icon)
                                 })
 
                                 //respeckTextView.text = "You are currently: Lying down"
@@ -294,33 +318,38 @@ class LiveDataActivity : AppCompatActivity() {
                                 }
                                 if (abs(total / 8) >= 0.33) {
                                     if (total / 8 < 0) {
-                                        text = "You are currently: Descending Stairs"
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Descending Stairs"
+                                            imageView.setBackgroundResource(drawable.descending_icon)
+                                        })
                                     } else {
-                                        text = "You are currently: Climbing Stairs"
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Climbing Stairs"
+                                            imageView.setBackgroundResource(drawable.climbing_icon)
+                                        })
                                     }
                                 } else {
-                                    text = "You are currently: Walking"
+                                    stepCounterWalking(x,y,z)
+                                    this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                        respeckTextView.text = "Walking"
+                                        imageView.setBackgroundResource(drawable.climbing_icon)
+                                        stepCountView.text = stepCount.toString()
+                                    })
                                 }
 
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = text
-                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
+                                    this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                        respeckTextView.text = "Sitting"
+                                        imageView.setBackgroundResource(drawable.sitting_icon)
+                                    })
                                 })
-
-
-
-                                //respeckTextView.text = "You are currently: Walking"
-                                //mainPageTextView.text = "Recognised activity: Walking"
-                                /*stepCounterWalking(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
 
                             }
                             4 -> {
                                 stepCounterRunning(x,y,z)
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     respeckTextView.text = "Running"
-                                    imageView.setBackgroundResource(R.drawable.running_icon)
+                                    imageView.setBackgroundResource(drawable.running_icon)
                                     stepCountView.text = stepCount.toString()
                                 })
                                 Log.i("DEBUG", stepCount.toString())
