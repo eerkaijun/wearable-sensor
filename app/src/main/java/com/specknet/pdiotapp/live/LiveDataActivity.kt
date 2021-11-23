@@ -251,7 +251,8 @@ class LiveDataActivity : AppCompatActivity() {
                                 var partialSums = DoubleArray(9)
                                 for (i in 0..8) {
                                     var partialTotal = 0.0
-                                    for (j in 5*i..5*(i+2)) {
+                                    var end = 5*(i+2) -1
+                                    for (j in 5*i..end) {
                                         partialTotal += inputValue[0][j][4]
                                     }
                                     partialSums[i] = partialTotal
