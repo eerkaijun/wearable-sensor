@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -28,7 +29,11 @@ import java.io.IOException
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.math.acos
+import kotlin.math.PI
+import kotlin.math.abs
 
 
 class LiveDataActivity : AppCompatActivity() {
@@ -37,17 +42,25 @@ class LiveDataActivity : AppCompatActivity() {
     var stepCount = 0
 
     var inputValue = Array(1) {
-        Array(50) {
-            FloatArray(6)
+        Array(2) {
+            Array(1) {
+                Array(25) {
+                    FloatArray(6)
+                }
+            }
         }
     }
     var outputValue = Array(1) {
         FloatArray(5)
     }
+    var fallingOutputValue = Array(1) {
+        FloatArray(4)
+    }
     var bufferCount = 0
 
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
+    lateinit var tfliteFalling: Interpreter
 
     //textviews
     lateinit var respeckTextView: TextView
@@ -81,9 +94,9 @@ class LiveDataActivity : AppCompatActivity() {
     val filterTestThingy = IntentFilter(Constants.ACTION_THINGY_BROADCAST)
 
     @Throws(IOException::class)
-    private fun loadModelFile(): MappedByteBuffer {
+    private fun loadModelFile(filename:String): MappedByteBuffer {
         // val assets: AssetManager = this.getAssets()
-        val fileDescriptor = this.assets.openFd("model_cnn.tflite")
+        val fileDescriptor = this.assets.openFd(filename)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -118,7 +131,8 @@ class LiveDataActivity : AppCompatActivity() {
 
         setupCharts()
 
-        tflite = Interpreter(loadModelFile())
+        tflite = Interpreter(loadModelFile("model_conv_lstm.tflite"))
+        tfliteFalling = Interpreter(loadModelFile("falling_model_conv_lstm.tflite"))
         Log.i("READ MODEL ", "SUCCESSFUL")
 
         // set up the broadcast receiver
@@ -141,7 +155,7 @@ class LiveDataActivity : AppCompatActivity() {
                     val z = liveData.accelZ
 
                     // Build a buffer with intervals of 2 seconds (25Hz)
-                    if (bufferCount >= 50) {
+                    if (bufferCount >= 25) {
                         // do model prediction
                         tflite.run(inputValue, outputValue)
                         Log.i("Predicted live data", outputValue.contentDeepToString())
@@ -149,31 +163,158 @@ class LiveDataActivity : AppCompatActivity() {
 
                         when(maxIdx) {
                             0 -> {
+                                var text = " "
+                                tfliteFalling.run(inputValue, fallingOutputValue)
+                                val index = fallingOutputValue[0].indices.maxBy { fallingOutputValue[0][it] } ?: -1
+                                if (index == 0) text = "Falling on the left"
+                                else if (index == 1) text = "Falling on the right"
+                                else if (index == 2) text = "Falling on the back"
+                                else if (index == 3) text = "Falling on knees"
+                                else text = "Falling"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = "Falling"
+                                    respeckTextView.text = text
                                     imageView.setBackgroundResource(R.drawable.falling_icon)
                                 })
                             }
                             1 -> {
+                                var text = " "
+                                var sumGyroY = 0.0
+                                var countGyroY = 0
+
+                                var sumX = 0.0
+                                var sumY = 0.0
+                                var sumZ = 0.0
+                                for (i in 0..1) {
+                                    for (j in 0..24) {
+                                        sumX += inputValue[0][i][0][j][0]
+                                        sumY += inputValue[0][i][0][j][1]
+                                        sumZ += inputValue[0][i][0][j][2]
+                                        if (inputValue[0][i][0][j][4] > -10 && inputValue[0][i][0][j][4] < 10){
+                                            sumGyroY += inputValue[0][i][0][j][4]
+                                            countGyroY += 1
+                                        }
+                                    }
+                                }
+                                val meanX = sumX / 50
+                                val meanY = sumY / 50
+                                val meanZ = sumZ / 50
+                                val meanGyroY = sumGyroY / countGyroY
+
+                                var stdX = 0.0
+                                var stdZ = 0.0
+                                for (i in 0..1) {
+                                    for (j in 0..24) {
+                                        stdX += (inputValue[0][i][0][j][0] - meanX).pow(2)
+                                        stdZ += (inputValue[0][i][0][j][2] - meanZ).pow(2)
+                                    }
+                                }
+                                stdX = sqrt(stdX / 50)
+                                stdZ = sqrt(stdZ / 50)
+
+                                val cosThetaZ = meanZ / (sqrt(meanX.pow(2) + meanY.pow(2) + meanZ.pow(2)))
+                                val thetaZ = acos(cosThetaZ) * 180 / PI
+
+                                if (stdX + stdZ > 0.04) {
+                                    text = "You are currently: Doing Desk Work"
+                                } else {
+                                    if (thetaZ > 85.0 && thetaZ < 95.0) {
+                                        if (meanGyroY <= 0.85) {
+                                            text = "You are currently: Sitting"
+                                        } else {
+                                            text = "You are currently: Standing"
+                                        }
+                                    } else if (thetaZ > 0.0 && thetaZ < 85.0) {
+                                        text = "You are currently: Sitting bent backward"
+                                    } else if (thetaZ > 95.0 && thetaZ < 180.0) {
+                                        text = "You are currently: Sitting bent forward"
+                                    } else {
+                                        text = "You are currently: Doing Desk Work"
+                                    }
+                                }
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = "Sitting/Standing"
+                                    respeckTextView.text = text
                                     imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
                             }
                             2 -> {
+                                var text = " "
+                                var sumX = 0.0
+                                var sumY = 0.0
+                                var sumZ = 0.0
+                                for (i in 0..1) {
+                                    for (j in 0..24) {
+                                        sumX += inputValue[0][i][0][j][0]
+                                        sumY += inputValue[0][i][0][j][1]
+                                        sumZ += inputValue[0][i][0][j][2]
+                                    }
+                                }
+                                val meanX = sumX / 50
+                                val meanY = sumY / 50
+                                val meanZ = sumZ / 50
+                                val cosThetaZ = meanZ / (sqrt(meanX.pow(2) + meanY.pow(2) + meanZ.pow(2)))
+                                val thetaZ = acos(cosThetaZ) * 180 / PI
+
+                                if (thetaZ in 0.0..45.0) {
+                                    text = "You are currently: Lying Down on Back"
+                                } else if (thetaZ > 45 && thetaZ <= 90) {
+                                    text = "You are currently: Lying Down on Right"
+                                } else if (thetaZ > 90 && thetaZ <= 135) {
+                                    text = "You are currently: Lying Down on Left"
+                                } else if (thetaZ > 135 && thetaZ <= 180) {
+                                    text = "You are currently: Lying Down on Stomach"
+                                } else {
+                                    text = "You are currently: Lying Down on Back"
+                                }
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = "Lying down"
-                                    imageView.setBackgroundResource(R.drawable.lyingdown_icon)
+                                    respeckTextView.text = text
+                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
+
+                                //respeckTextView.text = "You are currently: Lying down"
                             }
                             3 -> {
-                                stepCounterWalking(x,y,z)
+                                var text = " "
+                                var maximum = 0.0
+                                var partialSums = DoubleArray(8)
+                                for (i in 0..1) {
+                                    for (j in 0..3) {
+                                        var partialTotal = 0.0
+                                        var end = 5*(j+2) -1
+                                        for (k in 5*j..end) {
+                                            partialTotal += inputValue[0][i][0][k][4]
+                                        }
+                                        partialSums[i] = partialTotal
+                                        if (abs(partialTotal) > maximum) maximum = partialTotal
+                                    }
+                                }
+                                var total = 0.0
+                                for (i in 0..7) {
+                                    partialSums[i] = partialSums[i] / maximum
+                                    total += partialSums[i]
+                                }
+                                if (abs(total / 8) >= 0.33) {
+                                    if (total / 8 < 0) {
+                                        text = "You are currently: Descending Stairs"
+                                    } else {
+                                        text = "You are currently: Climbing Stairs"
+                                    }
+                                } else {
+                                    text = "You are currently: Walking"
+                                }
+
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = "Walking"
-                                    imageView.setBackgroundResource(R.drawable.walking_icon)
-                                    stepCountView.text = stepCount.toString()
+                                    respeckTextView.text = text
+                                    imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
-                                Log.i("DEBUG", stepCount.toString())
+
+
+
+                                //respeckTextView.text = "You are currently: Walking"
+                                //mainPageTextView.text = "Recognised activity: Walking"
+                                /*stepCounterWalking(x,y,z)
+                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
+                                stepCountView.text = currentCount.toString()*/
+
                             }
                             4 -> {
                                 stepCounterRunning(x,y,z)
@@ -188,7 +329,9 @@ class LiveDataActivity : AppCompatActivity() {
 
 
                         // only reset half of the buffer to make a one second sliding window
-                        inputValue[0].drop(25)
+                        val temp = inputValue[0][1][0]
+                        inputValue[0][0][0] = temp
+                        //inputValue[0][0][0].drop(25)
                         //Log.i("Buffer after resetting", inputValue.contentDeepToString());
                         //Log.i("Length of buffer after resetting", inputValue.size.toString());
                         /*
@@ -197,14 +340,16 @@ class LiveDataActivity : AppCompatActivity() {
                                 FloatArray(6)
                             }
                         }*/
-                        bufferCount = 25
+                        bufferCount = 0
                     }
-                    inputValue[0][bufferCount][0] = x
-                    inputValue[0][bufferCount][1] = y
-                    inputValue[0][bufferCount][2] = z
-                    inputValue[0][bufferCount][3] = liveData.gyro.x
-                    inputValue[0][bufferCount][4] = liveData.gyro.y
-                    inputValue[0][bufferCount][5] = liveData.gyro.z
+
+                    // shape (1, 2, 1, 25, 6)
+                    inputValue[0][1][0][bufferCount][0] = x
+                    inputValue[0][1][0][bufferCount][1] = y
+                    inputValue[0][1][0][bufferCount][2] = z
+                    inputValue[0][1][0][bufferCount][3] = liveData.gyro.x
+                    inputValue[0][1][0][bufferCount][4] = liveData.gyro.y
+                    inputValue[0][1][0][bufferCount][5] = liveData.gyro.z
 
                     bufferCount += 1
                     Log.i("Current buffer content", inputValue.contentDeepToString());
@@ -264,6 +409,23 @@ class LiveDataActivity : AppCompatActivity() {
         val handlerThingy = Handler(looperThingy)
         this.registerReceiver(thingyLiveUpdateReceiver, filterTestThingy, null, handlerThingy)
 
+    }
+
+    fun calculateSD(numArray: FloatArray): Double {
+        var sum = 0.0
+        var standardDeviation = 0.0
+
+        for (num in numArray) {
+            sum += num
+        }
+
+        val mean = sum / 10
+
+        for (num in numArray) {
+            standardDeviation += (num-mean).pow(2.0)
+        }
+
+        return sqrt(standardDeviation / 10)
     }
 
 
