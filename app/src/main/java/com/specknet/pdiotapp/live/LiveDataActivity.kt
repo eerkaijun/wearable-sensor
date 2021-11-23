@@ -41,7 +41,7 @@ import kotlin.math.abs
 
 class LiveDataActivity : AppCompatActivity() {
 
-    var lastMagnitude = 0.0f
+    var delay = 10000 //miliseconds
     var stepCount = 0
 
     var inputValue = Array(1) {
@@ -64,6 +64,10 @@ class LiveDataActivity : AppCompatActivity() {
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
     lateinit var tfliteFalling: Interpreter
+
+
+    //for alert dialog
+    lateinit var handler : Handler
 
     //textviews
     lateinit var respeckTextView: TextView
@@ -109,19 +113,19 @@ class LiveDataActivity : AppCompatActivity() {
     }
 
     fun stepCounterWalking(x: Float, y: Float, z: Float){
-        val magnitude = sqrt((x*x + y*y + z*z))
-        val delta = lastMagnitude - magnitude
-        lastMagnitude = magnitude
+        val magnitude = sqrt(((x*x) + (y*y) + (z*z)))
+        //val delta = lastMagnitude - magnitude
+        //lastMagnitude = magnitude
 
-        if(delta > 0.957)  stepCount++
+        if(magnitude > 0.8) stepCount++
     }
 
     fun stepCounterRunning(x: Float, y: Float, z: Float){
         val magnitude = sqrt(x*x + y*y + z*z)
-        val delta = lastMagnitude - magnitude
-        lastMagnitude = magnitude
+        //val delta = lastMagnitude - magnitude
+        //lastMagnitude = magnitude
 
-        if(delta > 1.2) stepCount++
+        if(magnitude > 1.0) stepCount++
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -279,15 +283,15 @@ class LiveDataActivity : AppCompatActivity() {
                                 val thetaZ = acos(cosThetaZ) * 180 / PI
 
                                 if (thetaZ in 0.0..45.0) {
-                                    text = "You are currently: Lying Down on Back"
+                                    text = "Lying Down on Back"
                                 } else if (thetaZ > 45 && thetaZ <= 90) {
-                                    text = "You are currently: Lying Down on Right"
+                                    text = "Lying Down on Right"
                                 } else if (thetaZ > 90 && thetaZ <= 135) {
-                                    text = "You are currently: Lying Down on Left"
+                                    text = "Lying Down on Left"
                                 } else if (thetaZ > 135 && thetaZ <= 180) {
-                                    text = "You are currently: Lying Down on Stomach"
+                                    text = "Lying Down on Stomach"
                                 } else {
-                                    text = "You are currently: Lying Down on Back"
+                                    text = "Lying Down on Back"
                                 }
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     respeckTextView.text = text
@@ -329,25 +333,26 @@ class LiveDataActivity : AppCompatActivity() {
                                         })
                                     }
                                 } else {
-                                    stepCounterWalking(x,y,z)
                                     this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                        stepCounterWalking(x,y,z)
+                                        Log.i("STEP ", stepCount.toString())
                                         respeckTextView.text = "Walking"
-                                        imageView.setBackgroundResource(drawable.climbing_icon)
+                                        imageView.setBackgroundResource(drawable.walking_icon)
                                         stepCountView.text = stepCount.toString()
                                     })
                                 }
 
-                                this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                /*this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                     this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                         respeckTextView.text = "Sitting"
                                         imageView.setBackgroundResource(drawable.sitting_icon)
                                     })
-                                })
+                                })*/
 
                             }
                             4 -> {
-                                stepCounterRunning(x,y,z)
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                    stepCounterRunning(x,y,z)
                                     respeckTextView.text = "Running"
                                     imageView.setBackgroundResource(drawable.running_icon)
                                     stepCountView.text = stepCount.toString()
