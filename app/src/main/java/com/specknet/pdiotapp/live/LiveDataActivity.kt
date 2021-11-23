@@ -15,6 +15,8 @@ import android.os.Looper
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
@@ -31,17 +33,23 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.acos
 import kotlin.math.PI
 import kotlin.math.abs
+import android.content.DialogInterface
+
+
+
 
 
 class LiveDataActivity : AppCompatActivity() {
 
     var delay = 10000 //miliseconds
+    var consecutive = 0
     var stepCount = 0
 
     var inputValue = Array(1) {
@@ -65,9 +73,6 @@ class LiveDataActivity : AppCompatActivity() {
     lateinit var tflite: Interpreter
     lateinit var tfliteFalling: Interpreter
 
-
-    //for alert dialog
-    lateinit var handler : Handler
 
     //textviews
     lateinit var respeckTextView: TextView
@@ -235,17 +240,25 @@ class LiveDataActivity : AppCompatActivity() {
                                     })
                                 } else {
                                     if (thetaZ > 85.0 && thetaZ < 95.0) {
-                                        if (meanGyroY <= 0.85) {
-                                            this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                                respeckTextView.text = "Sitting"
-                                                imageView.setBackgroundResource(drawable.sitting_icon)
-                                            })
-                                        } else {
-                                            this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                                respeckTextView.text = "Standing"
-                                                imageView.setBackgroundResource(drawable.standing_icon)
-                                            })
+                                        consecutive++
+
+                                        if(consecutive%30 == 0){
+                                            val builder1 = AlertDialog.Builder(context)
+                                            builder1.setMessage("Reminder for you to move :) ")
+                                            builder1.setCancelable(true)
+
+                                            builder1.setPositiveButton(
+                                                "Ok"
+                                            ) { dialog, id -> dialog.cancel() }
+
+                                            val alert11 = builder1.create()
+                                            alert11.show()
                                         }
+
+                                        this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
+                                            respeckTextView.text = "Sitting / Standing"
+                                            imageView.setBackgroundResource(drawable.standing_icon)
+                                        })
                                     } else if (thetaZ > 0.0 && thetaZ < 85.0) {
                                         this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                             respeckTextView.text = "Sitting bent backward"
