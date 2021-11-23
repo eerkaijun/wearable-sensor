@@ -201,7 +201,7 @@ class LiveDataActivity : AppCompatActivity() {
                                 val cosThetaZ = meanZ / (sqrt(meanX.pow(2) + meanY.pow(2) + meanZ.pow(2)))
                                 val thetaZ = acos(cosThetaZ) * 180 / PI
 
-                                if (stdX + stdZ > 0.0) {
+                                if (stdX + stdZ > 0.04) {
                                     text = "You are currently: Doing Desk Work"
                                 } else {
                                     if (thetaZ > 85.0 && thetaZ < 95.0) {
