@@ -53,10 +53,14 @@ class LiveDataActivity : AppCompatActivity() {
     var outputValue = Array(1) {
         FloatArray(5)
     }
+    var fallingOutputValue = Array(1) {
+        FloatArray(4)
+    }
     var bufferCount = 0
 
     // tflite interpreter to make real-time prediction
     lateinit var tflite: Interpreter
+    lateinit var tfliteFalling: Interpreter
 
     //textviews
     lateinit var respeckTextView: TextView
@@ -90,9 +94,9 @@ class LiveDataActivity : AppCompatActivity() {
     val filterTestThingy = IntentFilter(Constants.ACTION_THINGY_BROADCAST)
 
     @Throws(IOException::class)
-    private fun loadModelFile(): MappedByteBuffer {
+    private fun loadModelFile(filename:String): MappedByteBuffer {
         // val assets: AssetManager = this.getAssets()
-        val fileDescriptor = this.assets.openFd("model_conv_lstm.tflite")
+        val fileDescriptor = this.assets.openFd(filename)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -127,7 +131,8 @@ class LiveDataActivity : AppCompatActivity() {
 
         setupCharts()
 
-        tflite = Interpreter(loadModelFile())
+        tflite = Interpreter(loadModelFile("model_conv_lstm.tflite"))
+        tfliteFalling = Interpreter(loadModelFile("falling_model_conv_lstm.tflite"))
         Log.i("READ MODEL ", "SUCCESSFUL")
 
         // set up the broadcast receiver
@@ -158,8 +163,16 @@ class LiveDataActivity : AppCompatActivity() {
 
                         when(maxIdx) {
                             0 -> {
+                                var text = " "
+                                tfliteFalling.run(inputValue, fallingOutputValue)
+                                val index = fallingOutputValue[0].indices.maxBy { fallingOutputValue[0][it] } ?: -1
+                                if (index == 0) text = "Falling on the left"
+                                else if (index == 1) text = "Falling on the right"
+                                else if (index == 2) text = "Falling on the back"
+                                else if (index == 3) text = "Falling on knees"
+                                else text = "Falling"
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
-                                    respeckTextView.text = "Falling"
+                                    respeckTextView.text = text
                                     imageView.setBackgroundResource(R.drawable.falling_icon)
                                 })
                             }
