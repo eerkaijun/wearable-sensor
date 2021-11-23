@@ -22,6 +22,7 @@
             android:layout_marginTop="68dp"
             android:background="@drawable/ic_live_data_icon"
             android:backgroundTint="@color/indigo"
+            android:shadowColor="#3A3030"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -35,6 +36,7 @@
             android:layout_marginTop="68dp"
             android:background="@drawable/record_live"
             android:backgroundTint="@color/indigo"
+            android:shadowColor="#3A3030"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -47,6 +49,7 @@
             android:layout_marginTop="257dp"
             android:background="@drawable/record_icon"
             android:backgroundTint="@color/indigo"
+            android:shadowColor="#3A3030"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -58,6 +61,7 @@
             android:layout_marginStart="48dp"
             android:layout_marginTop="183dp"
             android:text="Connect Sensors"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -68,6 +72,7 @@
             android:layout_marginStart="224dp"
             android:layout_marginTop="183dp"
             android:text="Watch Live Data"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,6 +83,7 @@
             android:layout_marginStart="65dp"
             android:layout_marginTop="356dp"
             android:text="Record Data"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -85,8 +91,9 @@
             android:id="@+id/RespeckStatus"
             android:layout_width="117dp"
             android:layout_height="29dp"
-            android:layout_marginStart="190dp"
+            android:layout_marginStart="232dp"
             android:layout_marginTop="512dp"
+            android:shadowColor="#655050"
             android:text="Disconnected"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/red"
@@ -98,8 +105,9 @@
             android:id="@+id/ThingyStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="190dp"
-            android:layout_marginTop="557dp"
+            android:layout_marginStart="232dp"
+            android:layout_marginTop="556dp"
+            android:shadowColor="#655050"
             android:text="Disconnected"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="#F44336"
@@ -113,9 +121,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="512dp"
+            android:fontFamily="monospace"
             android:text="Respeck Status: "
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#150E0E"
+            android:textColor="#302E2E"
             app:layout_constraintEnd_toStartOf="@+id/RespeckStatus"
             app:layout_constraintHorizontal_bias="0.027"
             app:layout_constraintStart_toStartOf="parent"
@@ -127,9 +136,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="33dp"
             android:layout_marginTop="556dp"
+            android:fontFamily="monospace"
             android:text="Thingy Status: "
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#0E0808"
+            android:textColor="#302E2E"
             app:layout_constraintEnd_toStartOf="@+id/ThingyStatus"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -141,17 +151,18 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="34dp"
             android:layout_marginTop="604dp"
+            android:fontFamily="monospace"
             android:text="Recognised Activity:"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#151414"
+            android:textColor="#302E2E"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/activity_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="217dp"
+            android:layout_width="128dp"
+            android:layout_height="90dp"
+            android:layout_marginStart="264dp"
             android:layout_marginTop="604dp"
             android:autoText="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"

@@ -94,7 +94,7 @@ class LiveDataActivity : AppCompatActivity() {
     lateinit var allThingyData: LineData
 
     lateinit var respeckChart: LineChart
-    lateinit var thingyChart: LineChart
+    //lateinit var thingyChart: LineChart
 
 
     // global broadcast receiver so we can unregister it
@@ -134,6 +134,7 @@ class LiveDataActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         //to update the live data layout
@@ -148,9 +149,28 @@ class LiveDataActivity : AppCompatActivity() {
         tfliteFalling = Interpreter(loadModelFile("falling_model_conv_lstm.tflite"))
         Log.i("READ MODEL ", "SUCCESSFUL")
 
+
+
         // set up the broadcast receiver
         respeckLiveUpdateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+
+                fun reminder(){
+                    consecutive++
+
+                    if(consecutive%30 == 0){
+                        val builder1 = AlertDialog.Builder(context)
+                        builder1.setMessage("Reminder for you to move :) ")
+                        builder1.setCancelable(true)
+
+                        builder1.setPositiveButton(
+                            "Ok"
+                        ) { dialog, id -> dialog.cancel() }
+
+                        val alert11 = builder1.create()
+                        alert11.show()
+                    }
+                }
 
                 Log.i("thread", "I am running on thread = " + Thread.currentThread().name)
 
@@ -234,26 +254,14 @@ class LiveDataActivity : AppCompatActivity() {
                                 val thetaZ = acos(cosThetaZ) * 180 / PI
 
                                 if (stdX + stdZ > 0.04) {
+                                    reminder()
                                     this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                         respeckTextView.text = "Doing Desk Work"
                                         imageView.setBackgroundResource(drawable.desk_icon)
                                     })
                                 } else {
+                                    reminder()
                                     if (thetaZ > 85.0 && thetaZ < 95.0) {
-                                        consecutive++
-
-                                        if(consecutive%30 == 0){
-                                            val builder1 = AlertDialog.Builder(context)
-                                            builder1.setMessage("Reminder for you to move :) ")
-                                            builder1.setCancelable(true)
-
-                                            builder1.setPositiveButton(
-                                                "Ok"
-                                            ) { dialog, id -> dialog.cancel() }
-
-                                            val alert11 = builder1.create()
-                                            alert11.show()
-                                        }
 
                                         this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
                                             respeckTextView.text = "Sitting / Standing"
@@ -478,7 +486,7 @@ class LiveDataActivity : AppCompatActivity() {
 
     fun setupCharts() {
         respeckChart = findViewById(R.id.respeck_chart)
-        thingyChart = findViewById(R.id.thingy_chart)
+        //thingyChart = findViewById(R.id.thingy_chart)
 
         // Respeck
 
@@ -563,8 +571,8 @@ class LiveDataActivity : AppCompatActivity() {
         dataSetsThingy.add(dataSet_thingy_accel_z)
 
         allThingyData = LineData(dataSetsThingy)
-        thingyChart.data = allThingyData
-        thingyChart.invalidate()
+        //thingyChart.data = allThingyData
+        //thingyChart.invalidate()
     }
 
     fun updateGraph(graph: String, x: Float, y: Float, z: Float) {
@@ -589,10 +597,10 @@ class LiveDataActivity : AppCompatActivity() {
 
             runOnUiThread {
                 allThingyData.notifyDataChanged()
-                thingyChart.notifyDataSetChanged()
+                /*thingyChart.notifyDataSetChanged()
                 thingyChart.invalidate()
                 thingyChart.setVisibleXRangeMaximum(150f)
-                thingyChart.moveViewToX(thingyChart.lowestVisibleX + 40)
+                thingyChart.moveViewToX(thingyChart.lowestVisibleX + 40)*/
             }
         }
 

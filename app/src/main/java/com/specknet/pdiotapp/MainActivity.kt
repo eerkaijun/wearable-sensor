@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var respeckLiveUpdateReceiver: BroadcastReceiver
     lateinit var looperRespeck: Looper
     val filterTestRespeck = IntentFilter(Constants.ACTION_RESPECK_LIVE_BROADCAST)
+    var consecutive = 0
+
 
     var inputValue = Array(1) {
         Array(2) {
@@ -177,6 +179,20 @@ class MainActivity : AppCompatActivity() {
                                 //mainPageTextView.text = "Recognised activity: Falling"
                             }
                             1 -> {
+                                consecutive++
+
+                                if(consecutive%30 == 0){
+                                    val builder1 = AlertDialog.Builder(context)
+                                    builder1.setMessage("Reminder for you to move :) ")
+                                    builder1.setCancelable(true)
+
+                                    builder1.setPositiveButton(
+                                        "Ok"
+                                    ) { dialog, id -> dialog.cancel() }
+
+                                    val alert11 = builder1.create()
+                                    alert11.show()
+                                }
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Sitting/Standing"
                                 })
