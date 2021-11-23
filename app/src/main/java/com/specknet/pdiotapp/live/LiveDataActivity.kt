@@ -33,6 +33,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.acos
 import kotlin.math.PI
+import kotlin.math.abs
 
 
 class LiveDataActivity : AppCompatActivity() {
@@ -245,7 +246,35 @@ class LiveDataActivity : AppCompatActivity() {
                                 //respeckTextView.text = "You are currently: Lying down"
                             }
                             3 -> {
-                                respeckTextView.text = "You are currently: Walking"
+
+                                var maximum = 0.0
+                                var partialSums = DoubleArray(9)
+                                for (i in 0..8) {
+                                    var partialTotal = 0.0
+                                    for (j in 5*i..5*(i+2)) {
+                                        partialTotal += inputValue[0][j][4]
+                                    }
+                                    partialSums[i] = partialTotal
+                                    if (abs(partialTotal) > maximum) maximum = partialTotal
+                                }
+                                var total = 0.0
+                                for (i in 0..8) {
+                                    partialSums[i] = partialSums[i] / maximum
+                                    total += partialSums[i]
+                                }
+                                if (abs(total / 9) >= 0.33) {
+                                    if (total / 9 < 0) {
+                                        respeckTextView.text = "You are currently: Descending Stairs"
+                                    } else {
+                                        respeckTextView.text = "You are currently: Climbing Stairs"
+                                    }
+                                } else {
+                                    respeckTextView.text = "You are currently: Walking"
+                                }
+
+
+
+                                //respeckTextView.text = "You are currently: Walking"
                                 //mainPageTextView.text = "Recognised activity: Walking"
                                 /*stepCounterWalking(x,y,z)
                                 var currentCount  = stepCountView.text.toString().toInt() + stepCount
