@@ -38,6 +38,7 @@ import kotlin.math.abs
 
 class LiveDataActivity : AppCompatActivity() {
 
+    //for stepCounting
     var lastMagnitude = 0.0f
     var stepCount = 0
 
@@ -67,6 +68,7 @@ class LiveDataActivity : AppCompatActivity() {
     lateinit var stepCountView: TextView
 
     lateinit var imageView: ImageView
+
     // global graph variables
     lateinit var dataSet_res_accel_x: LineDataSet
     lateinit var dataSet_res_accel_y: LineDataSet
@@ -270,7 +272,6 @@ class LiveDataActivity : AppCompatActivity() {
                                     imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
 
-                                //respeckTextView.text = "You are currently: Lying down"
                             }
                             3 -> {
                                 var text = " "
@@ -307,14 +308,6 @@ class LiveDataActivity : AppCompatActivity() {
                                     imageView.setBackgroundResource(R.drawable.sitting_icon)
                                 })
 
-
-
-                                //respeckTextView.text = "You are currently: Walking"
-                                //mainPageTextView.text = "Recognised activity: Walking"
-                                /*stepCounterWalking(x,y,z)
-                                var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                                stepCountView.text = currentCount.toString()*/
-
                             }
                             4 -> {
                                 this@LiveDataActivity.runOnUiThread(java.lang.Runnable {
@@ -329,15 +322,7 @@ class LiveDataActivity : AppCompatActivity() {
                         // only reset half of the buffer to make a one second sliding window
                         val temp = inputValue[0][1][0]
                         inputValue[0][0][0] = temp
-                        //inputValue[0][0][0].drop(25)
-                        //Log.i("Buffer after resetting", inputValue.contentDeepToString());
-                        //Log.i("Length of buffer after resetting", inputValue.size.toString());
-                        /*
-                        inputValue = Array(1) {
-                            Array(50) {
-                                FloatArray(6)
-                            }
-                        }*/
+
                         bufferCount = 0
                     }
 
@@ -376,8 +361,6 @@ class LiveDataActivity : AppCompatActivity() {
                 val action = intent.action
 
                 if (action == Constants.ACTION_THINGY_BROADCAST) {
-                    //thingyStatus.text = "Connected"
-                    //thingyStatus.setTextColor(Color.parseColor("#008000"))
 
                     val liveData =
                         intent.getSerializableExtra(Constants.THINGY_LIVE_DATA) as ThingyLiveData
@@ -392,11 +375,6 @@ class LiveDataActivity : AppCompatActivity() {
                     updateGraph("thingy", x, y, z)
 
                 }
-                /*else{
-                    thingyStatus.text = "Disconnected"
-                    thingyStatus.setTextColor(Color.parseColor("#ff0000"))
-
-                }*/
             }
         }
 

@@ -138,8 +138,7 @@ class MainActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
 
                 Log.i("thread", "I am running on thread = " + Thread.currentThread().name)
-                //tflite.run(inputValue, outputValue)
-                //Log.i("BEFORE EVERYTHING", outputValue.contentDeepToString())
+
 
                 val action = intent.action
 
@@ -167,68 +166,41 @@ class MainActivity : AppCompatActivity() {
                         Log.i("Predicted live data in main activity", outputValue.contentDeepToString())
                         val maxIdx = outputValue[0].indices.maxBy { outputValue[0][it] } ?: -1
 
-                        //try {
                         when (maxIdx) {
                             0 -> {
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Falling"
                                 })
-                                //activityMainTextView.text = "Falling"
-                                //mainPageTextView.text = "Recognised activity: Falling"
                             }
                             1 -> {
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Sitting/Standing"
                                 })
-                                //activityMainTextView.text = "Sitting/Standing"
-                                //mainPageTextView.text = "Recognised activity: Sitting/Standing"
+
                             }
                             2 -> {
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Lying down"
                                 })
-                                //activityMainTextView.text = "Lying down"
-                                //mainPageTextView.text = "Recognised activity: Lying down"
+
                             }
                             3 -> {
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Walking"
                                 })
-                                //activityMainTextView.text = "Walking"
-                                //mainPageTextView.text = "Recognised activity: Walking"
-                                /*stepCounterWalking(x,y,z)
-                            var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                            stepCountView.text = currentCount.toString()*/
+
 
                             }
                             4 -> {
                                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                                     activityMainTextView.text = "Running"
                                 })
-                                //activityMainTextView.text = "Running"
-                                //mainPageTextView.text = "Recognised activity: Running"
-                                /*stepCounterRunning(x,y,z)
-                            var currentCount  = stepCountView.text.toString().toInt() + stepCount
-                            stepCountView.text = currentCount.toString()*/
                             }
                         }
-                        //} catch(ex: Exception) {
-                        //    Log.d("ERRORRRRRRRRRRRR", ex.toString())
-                        //}
-
 
                         // only reset half of the buffer to make a one second sliding window
                         val temp = inputValue[0][1][0]
                         inputValue[0][0][0] = temp
-                        //inputValue[0][0][0].drop(25)
-                        //Log.i("Buffer after resetting", inputValue.contentDeepToString());
-                        //Log.i("Length of buffer after resetting", inputValue.size.toString());
-                        /*
-                        inputValue = Array(1) {
-                            Array(50) {
-                                FloatArray(6)
-                            }
-                        }*/
                         bufferCount = 0
                     }
 
